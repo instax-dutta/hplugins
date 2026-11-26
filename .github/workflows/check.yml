@@ -37,7 +37,7 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
         run: |
           set -euo pipefail
-          git fetch origin "$BASE_REF" --depth=1
+          git fetch origin "$BASE_REF" --no-tags
           changed=$(git diff --name-only "origin/$BASE_REF...HEAD")
           if echo "$changed" | grep -qx 'data/catalog.json' && ! echo "$changed" | grep -qx 'data/search-index.json'; then
             echo "data/catalog.json changed but data/search-index.json was not regenerated"

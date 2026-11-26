@@ -1,0 +1,89 @@
+name: auto-merge verified PRs
+
+on:
+  workflow_run:
+    workflows: ["check catalog"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+jobs:
+  merge:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify exact commit, checks, and scope, then merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+
+          pr=$(gh api "repos/$REPO/commits/$HEAD_SHA/pulls" --jq '.[0].number // empty')
+          if [ -z "$pr" ]; then
+            echo "No open pull request found for $HEAD_SHA"
+            exit 0
+          fi
+
+          pr_json=$(gh api "repos/$REPO/pulls/$pr")
+          state=$(echo "$pr_json" | jq -r '.state')
+          draft=$(echo "$pr_json" | jq -r '.draft')
+          pr_sha=$(echo "$pr_json" | jq -r '.head.sha')
+          base=$(echo "$pr_json" | jq -r '.base.ref')
+
+          if [ "$state" != "open" ] || [ "$draft" != "false" ]; then
+            echo "PR is closed or still a draft; skipping"
+            exit 0
+          fi
+          if [ "$pr_sha" != "$HEAD_SHA" ]; then
+            echo "PR head moved after checks ran; skipping"
+            exit 0
+          fi
+          if [ "$base" != "main" ]; then
+            echo "PR targets $base, not main; skipping"
+            exit 0
+          fi
+
+          failed=$(gh api "repos/$REPO/commits/$HEAD_SHA/check-runs" \
+            --jq '[.check_runs[] | select(.status != "completed" or (.conclusion != "success" and .conclusion != "neutral" and .conclusion != "skipped")) | .name] | join(", ")')
+          if [ -n "$failed" ]; then
+            echo "Checks are not green: $failed"
+            exit 0
+          fi
+
+          unresolved=$(gh api graphql \
+            -f query='query($owner:String!,$repo:String!,$number:Int!){repository(owner:$owner,name:$repo){pullRequest(number:$number){reviewThreads(first:100){nodes{isResolved}}}}}' \
+            -f owner="${REPO%%/*}" -f repo="${REPO##*/}" -F number="$pr" \
+            --jq '[.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)] | length')
+          if [ "$unresolved" != "0" ]; then
+            echo "PR has unresolved review threads; skipping"
+            exit 0
+          fi
+
+          files=$(gh api "repos/$REPO/pulls/$pr/files" --paginate --jq '.[].filename')
+          manual=$(echo "$files" | grep -vE '^(data/|docs/|HERETIC_PLUGINS\.md$|README\.md$|DESIGN\.md$|PRODUCT\.md$|AGENTS\.md$)' || true)
+          if [ -n "$manual" ]; then
+            echo "Manual review required for files outside catalog and docs:"
+            echo "$manual"
+            exit 0
+          fi
+
+          mergeable=$(echo "$pr_json" | jq -r '.mergeable')
+          for attempt in 1 2 3; do
+            if [ "$mergeable" != "null" ]; then break; fi
+            sleep 5
+            mergeable=$(gh api "repos/$REPO/pulls/$pr" --jq '.mergeable')
+          done
+          if [ "$mergeable" != "true" ]; then
+            echo "PR is not mergeable; skipping"
+            exit 0
+          fi
+
+          echo "All checks passed on $HEAD_SHA; merging PR #$pr"
+          gh pr merge "$pr" --repo "$REPO" --squash

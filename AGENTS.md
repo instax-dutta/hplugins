@@ -82,6 +82,8 @@ Default section order:
 - Every catalog entry must carry a short description, a usage guide, a source link, and a copy-paste setup prompt.
 - The Krea 2 plugin sources shipped at the repo root are linked from their catalog entries; keep them present and served by Pages.
 - Custom domain is `hplugins.sdad.pro`; the root `CNAME` file must keep that exact value.
+- The site CTA is "Contribute a part" and links to `docs/contributing.md` on GitHub.
+- PRs touching only catalog data or docs auto-merge after all checks pass on the exact head commit; code, workflow, test, and asset changes require human review.
 
 ## User Preferences
 

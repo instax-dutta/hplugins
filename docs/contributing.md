@@ -1,28 +1,102 @@
-# Contributing an entry
+# Contribute a part to hplugins
 
-Entries live in `data/catalog.json`. One entry per plugin or artifact. Built-in default scorers are not listed.
+Thanks for helping people find good Heretic work. The site is a static registry: you add one entry to a JSON file, and the build layer validates it, regenerates the search index, and publishes it. No coding framework is involved.
 
-1. Add an object with these fields:
+## What can be listed
 
-   | Field | Rule |
-   | --- | --- |
-   | `slug` | lowercase words separated by hyphens, unique |
-   | `name` | the name people use for it |
-   | `type` | `scorer`, `modifier`, `config`, `model`, `fork`, or `tool` |
-   | `author` | who made it, or `community` when unnamed |
-   | `summary` | one sentence, under 160 characters |
-   | `description` | a short paragraph of what it does and when to use it |
-   | `status` | `available`, `community`, `proof-of-concept`, or `planned` |
-   | `tags` | short lowercase search terms |
-   | `where_to_find` | array of `{ "label": "...", "url": "https://..." }` |
-   | `how_to_use` | array of ordered strings the visitor can follow |
-   | `config_snippet` | the exact `config.toml` fragment, or empty string |
-   | `setup_prompt` | a complete prompt for a coding model with no Heretic context |
+Community-made or non-default Heretic work: scorers, modifiers, configs, companion models, forks, and tools. Built-in default scorers are documented in `HERETIC_PLUGINS.md` and are not listed as entries.
 
-2. Write the setup prompt as if the reader has a Heretic checkout but no knowledge of the plugin. Name the plugin, its path or model ID, the config keys to add, and one command or check that proves it loaded.
-3. Run `python3 tools/build.py`. It validates the catalog and regenerates the search index.
-4. Run `python3 -m unittest discover -s tests -v`.
-5. Open the site locally with `python3 -m http.server 8000` and check `#/p/<your-slug>` renders.
-6. Commit both `data/catalog.json` and the regenerated `data/search-index.json`.
+## Step 1: add one entry
 
-Do not invent links or benchmark numbers. If the only source is a chat discussion, link it and set `status` to `community` or `proof-of-concept`.
+Open `data/catalog.json` and add one object to the array. Use this exact shape:
+
+| Field | Rule |
+| --- | --- |
+| `slug` | lowercase words separated by hyphens, unique, used in the page URL |
+| `name` | the name people use for the plugin |
+| `type` | one of `scorer`, `modifier`, `config`, `model`, `fork`, `tool` |
+| `author` | who made it, or `community` when unnamed |
+| `summary` | one sentence under 160 characters; this is what the list shows |
+| `description` | a short paragraph: what it does and when to use it |
+| `status` | one of `available`, `community`, `proof-of-concept`, `planned` |
+| `tags` | non-empty array of lowercase search terms |
+| `where_to_find` | non-empty array of `{ "label": "...", "url": "https://..." }` |
+| `how_to_use` | non-empty array of ordered steps a visitor can follow |
+| `config_snippet` | the exact `config.toml` fragment, or an empty string |
+| `setup_prompt` | a complete prompt for a coding model with no Heretic context |
+
+A minimal entry:
+
+```json
+{
+  "slug": "example-scorer",
+  "name": "Example Scorer",
+  "type": "scorer",
+  "author": "community",
+  "summary": "One sentence describing what it measures.",
+  "description": "A short paragraph about the problem it solves and when to use it.",
+  "status": "community",
+  "tags": ["scorer", "example"],
+  "where_to_find": [
+    { "label": "Source repository", "url": "https://github.com/owner/repo" }
+  ],
+  "how_to_use": [
+    "Copy the plugin file into your Heretic working directory.",
+    "Add the scorer entry to config.toml.",
+    "Run a short trial and check the reported score."
+  ],
+  "config_snippet": "scorers = [\n    { plugin = \"./example.py:ExampleScorer\", optimization = \"minimize\" },\n]",
+  "setup_prompt": "Install Example Scorer in my Heretic checkout. Copy example.py next to config.toml, add { plugin = \"./example.py:ExampleScorer\", optimization = \"minimize\" } to the scorers list, keep KLDivergence minimizing, and verify with a short trial that a score line is printed. Do not change other scorers."
+}
+```
+
+### Writing the setup prompt
+
+Write it for someone who has a Heretic checkout but has never seen this plugin. It must:
+
+- name the plugin and its exact file path or model ID;
+- state the config keys and optimization direction to add;
+- include one command or log line that proves the setup loaded;
+- avoid inventing benchmarks, licenses, or capabilities.
+
+Do not invent links or numbers. If the only source is a chat discussion, link that discussion and use `community` or `proof-of-concept` as the status. A site-relative link must point to a file that exists in the repository; the validator rejects dead local links.
+
+## Step 2: regenerate and verify locally
+
+```bash
+python3 tools/build.py
+python3 -m unittest discover -s tests -v
+python3 -m http.server 8000
+```
+
+Then visit `http://localhost:8000/#/p/<your-slug>` and confirm the entry renders with its guide, source links, and setup prompt.
+
+## Step 3: open a pull request
+
+Commit **both** `data/catalog.json` and the regenerated `data/search-index.json`. Use this PR format:
+
+**Title:** `Add <Name> (<type>)` or `Update <Name>`
+
+**Body:**
+
+```markdown
+## What changed
+One or two sentences about the entry.
+
+## Source
+Where the plugin comes from, with a link.
+
+## Checklist
+- [ ] I ran `python3 tools/build.py`
+- [ ] I ran `python3 -m unittest discover -s tests -v`
+- [ ] I checked `#/p/<slug>` locally
+- [ ] I did not invent links, licenses, or benchmark numbers
+```
+
+### What CI checks
+
+Every PR runs the `check catalog` workflow: catalog schema validation, generated-index freshness, all tests, JSON parsing, JavaScript syntax, and a check that `catalog.json` and `search-index.json` move together.
+
+### Auto-merge policy
+
+PRs that change only catalog data, docs, or Markdown are merged automatically once every check passes on the exact PR commit and there are no unresolved review comments. PRs that touch code, workflows, tests, or assets need a human review. If your PR is not merged automatically, that is expected for those files; a maintainer will take it from there.

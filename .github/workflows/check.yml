@@ -2,17 +2,48 @@ name: check catalog
 
 on:
   push:
+    branches: [main]
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
       - name: Validate catalog and generated index
         run: python3 tools/build.py --check
+
+      - name: Check JSON files parse
+        run: python3 -m json.tool data/catalog.json > /dev/null && python3 -m json.tool data/search-index.json > /dev/null
+
       - name: Run tests
         run: python3 -m unittest discover -s tests -v
+
+      - name: Check JavaScript syntax
+        run: node --check assets/js/app.js
+
+      - name: Catalog and index must move together
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          set -euo pipefail
+          git fetch origin "$BASE_REF" --depth=1
+          changed=$(git diff --name-only "origin/$BASE_REF...HEAD")
+          if echo "$changed" | grep -qx 'data/catalog.json' && ! echo "$changed" | grep -qx 'data/search-index.json'; then
+            echo "data/catalog.json changed but data/search-index.json was not regenerated"
+            exit 1
+          fi
+          if echo "$changed" | grep -qx 'data/search-index.json' && ! echo "$changed" | grep -qx 'data/catalog.json'; then
+            echo "data/search-index.json changed without data/catalog.json"
+            exit 1
+          fi

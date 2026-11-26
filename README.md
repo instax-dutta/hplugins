@@ -38,3 +38,5 @@ Step-by-step instructions, including the exact entry format, are in [docs/contri
 ## About
 
 hplugins is built with plain HTML, CSS, and JavaScript and hosted on GitHub Pages. Sources stay attributed to their authors, and the catalog is open for anyone to improve.
+
+AI assistants that support `llms.txt` can read a compact index at https://hplugins.sdad.pro/llms.txt. The full text of every entry is at https://hplugins.sdad.pro/llms-full.txt.

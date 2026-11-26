@@ -3,16 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>hplugins - Community-built Heretic plugins and scorers</title>
-  <meta name="description" content="A curated index of community-built Heretic scorers, modifiers, configs, and models. Each entry includes source links, a usage guide, and a copy-paste setup prompt.">
-  <meta name="site-root" content="../../">
+  <title>Krea2Drift - hplugins</title>
+  <meta name="description" content="Measures how far an ablation shifts the text conditioning that Krea 2 feeds to its image model, without generating an image.">
+    <link rel="canonical" href="https://hplugins.sdad.pro/entries/krea2-drift/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="hplugins">
+  <meta property="og:title" content="Krea2Drift - hplugins">
+  <meta property="og:description" content="Measures how far an ablation shifts the text conditioning that Krea 2 feeds to its image model, without generating an image.">
+  <meta property="og:url" content="https://hplugins.sdad.pro/entries/krea2-drift/">
+  <meta property="og:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Krea2Drift - hplugins">
+  <meta name="twitter:description" content="Measures how far an ablation shifts the text conditioning that Krea 2 feeds to its image model, without generating an image.">
+  <meta name="twitter:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Krea2Drift", "description": "Measures how far an ablation shifts the text conditioning that Krea 2 feeds to its image model, without generating an image.", "author": {"@type": "Person", "name": "zubzer0"}, "keywords": "scorer, krea2, qwen3-vl, image, diagnostic", "inLanguage": "en", "mainEntityOfPage": "https://hplugins.sdad.pro/entries/krea2-drift/", "isPartOf": {"@type": "WebSite", "name": "hplugins", "url": "https://hplugins.sdad.pro/"}, "citation": ["https://discord.com/channels/1447831134212984903/1447845008534405270"]}</script>
+    <meta name="site-root" content="../../">
   <meta name="entry-slug" content="krea2-drift">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#EDEFF1">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../../assets/fonts/archivo-400-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../../assets/css/site.css?v=5">
+  <link rel="stylesheet" href="../../assets/css/site.css?v=6">
   <script>
     // Applied before paint so the plate never flashes the wrong theme.
     (function () {
@@ -23,7 +35,7 @@
       } catch (e) {}
     })();
   </script>
-  <script src="../../assets/js/app.js?v=5" defer></script>
+  <script src="../../assets/js/app.js?v=6" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -55,7 +67,17 @@
     </aside>
 
     <main class="main" id="main">
-      <div id="view" aria-live="polite"></div>
+      <div id="view" aria-live="polite"><div class="article"><a class="crumb" href="../../">&larr; back to index</a><h1 class="article-title">Krea2Drift</h1><p class="article-meta">/scorer - by zubzer0 - community</p><p class="article-lead">Measures how far an ablation shifts the text conditioning that Krea 2 feeds to its image model, without generating an image.</p><section class="article-section"><h2 class="section-title">What it does</h2><p class="prose">Reads the fused text tensor from twelve tapped Qwen3-VL layers and reports the mean token cosine drift against the unmodified model, in percent. It is a diagnostic: the shared config uses optimization = none so the score is visible without steering the optimizer. Very sensitive to prompt choice, and it needs a Krea 2 Turbo safetensors checkpoint and roughly 16 GB of VRAM.</p></section><section class="article-section"><h2 class="section-title">Where to find it</h2><ul class="link-list"><li><a href="https://discord.com/channels/1447831134212984903/1447845008534405270">Discord post with config</a></li><li><a href="../../docs/HERETIC_PLUGINS.md">Extracted inventory</a></li></ul></section><section class="article-section"><h2 class="section-title">How to use it</h2><ol class="steps"><li>Copy plugins/krea2_drift.py into the working directory you run Heretic from.</li><li>Copy the [scorer.Krea2Drift] block from the source post into config.toml and set checkpoint_path to your local Krea 2 Turbo safetensors file.</li><li>Keep optimization = none if you only want the number printed per trial.</li><li>Run Heretic on Qwen3-VL-4B-Instruct and read the Krea 2 drift line in the trial output.</li></ol></section><section class="article-section"><h2 class="section-title">Config fragment</h2><pre class="code-block">scorers = [
+    { plugin = &quot;./krea2_drift.py:Krea2Drift&quot;, optimization = &quot;none&quot; },
+]
+
+[scorer.Krea2Drift]
+checkpoint_path = &quot;krea2turbo-bf16.safetensors&quot;
+max_length = 512
+noise_limit = 0.01
+
+[scorer.Krea2Drift.prompts]
+dataset = &quot;good_image_prompts.txt&quot;</pre></section><section class="article-section"><h2 class="section-title">Setup prompt</h2><pre class="code-block">Set up the Krea2Drift diagnostic scorer in my local Heretic installation. Copy plugins/krea2_drift.py into your Heretic working directory as krea2_drift.py. Add an entry { plugin = &quot;./krea2_drift.py:Krea2Drift&quot;, optimization = &quot;none&quot; } to the scorers list in config.toml, then add [scorer.Krea2Drift] with checkpoint_path pointing at my local Krea 2 Turbo safetensors file, max_length = 512, noise_limit = 0.01, and a [scorer.Krea2Drift.prompts] section whose dataset is a local text file of image prompts. Keep optimization as none: this scorer is a measurement, not an objective. Use a Qwen3-VL model and tell me if my VRAM is below roughly 16 GB before running. Verify by starting a one-trial Heretic run and confirming a &#x27;Krea 2 drift&#x27; line appears in the trial output. Do not generate an image and do not change any other scorer.</pre></section></div></div>
     </main>
   </div>
 

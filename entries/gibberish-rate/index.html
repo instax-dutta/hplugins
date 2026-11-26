@@ -3,16 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>hplugins - Community-built Heretic plugins and scorers</title>
-  <meta name="description" content="A curated index of community-built Heretic scorers, modifiers, configs, and models. Each entry includes source links, a usage guide, and a copy-paste setup prompt.">
-  <meta name="site-root" content="../../">
+  <title>GibberishRate - hplugins</title>
+  <meta name="description" content="Flags trials whose responses turn into gibberish by counting distinct Unicode scripts.">
+    <link rel="canonical" href="https://hplugins.sdad.pro/entries/gibberish-rate/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="hplugins">
+  <meta property="og:title" content="GibberishRate - hplugins">
+  <meta property="og:description" content="Flags trials whose responses turn into gibberish by counting distinct Unicode scripts.">
+  <meta property="og:url" content="https://hplugins.sdad.pro/entries/gibberish-rate/">
+  <meta property="og:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="GibberishRate - hplugins">
+  <meta name="twitter:description" content="Flags trials whose responses turn into gibberish by counting distinct Unicode scripts.">
+  <meta name="twitter:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "GibberishRate", "description": "Flags trials whose responses turn into gibberish by counting distinct Unicode scripts.", "author": {"@type": "Person", "name": "randomlygeneratedusername"}, "keywords": "scorer, gibberish, unicode, ara, guardrail", "inLanguage": "en", "mainEntityOfPage": "https://hplugins.sdad.pro/entries/gibberish-rate/", "isPartOf": {"@type": "WebSite", "name": "hplugins", "url": "https://hplugins.sdad.pro/"}, "citation": ["https://discord.com/channels/1447831134212984903/1447845008534405270", "https://github.com/p-e-w/heretic/blob/master/src/heretic/scorer.py"]}</script>
+    <meta name="site-root" content="../../">
   <meta name="entry-slug" content="gibberish-rate">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#EDEFF1">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../../assets/fonts/archivo-400-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../../assets/css/site.css?v=5">
+  <link rel="stylesheet" href="../../assets/css/site.css?v=6">
   <script>
     // Applied before paint so the plate never flashes the wrong theme.
     (function () {
@@ -23,7 +35,7 @@
       } catch (e) {}
     })();
   </script>
-  <script src="../../assets/js/app.js?v=5" defer></script>
+  <script src="../../assets/js/app.js?v=6" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -55,7 +67,16 @@
     </aside>
 
     <main class="main" id="main">
-      <div id="view" aria-live="polite"></div>
+      <div id="view" aria-live="polite"><div class="article"><a class="crumb" href="../../">&larr; back to index</a><h1 class="article-title">GibberishRate</h1><p class="article-meta">/scorer - by randomlygeneratedusername - proof-of-concept</p><p class="article-lead">Flags trials whose responses turn into gibberish by counting distinct Unicode scripts.</p><section class="article-section"><h2 class="section-title">What it does</h2><p class="prose">A community scorer written with coding-model assistance after ARA runs produced incoherent outputs. It probes a few prompts per trial and classifies a response as gibberish when it contains more than a configured number of distinct scripts. By default it skips or aborts affected trials rather than adding another optimization objective. No source repository was published; only the config snippet is available.</p></section><section class="article-section"><h2 class="section-title">Where to find it</h2><ul class="link-list"><li><a href="https://discord.com/channels/1447831134212984903/1447845008534405270">Discord config snippet</a></li><li><a href="https://github.com/p-e-w/heretic/blob/master/src/heretic/scorer.py">Heretic plugin interface</a></li></ul></section><section class="article-section"><h2 class="section-title">How to use it</h2><ol class="steps"><li>Find or write a GibberishRate plugin class that reads n_prompts, max_scripts, and min_characters_per_script from its config section.</li><li>Save it as gibberish_rate.py next to config.toml.</li><li>Add the [scorer.GibberishRate] block from the source snippet, with optimization = none if you only want bad trials skipped.</li><li>Run a short ARA trial set and confirm the probe responses are checked.</li></ol></section><section class="article-section"><h2 class="section-title">Config fragment</h2><pre class="code-block">[scorer.GibberishRate]
+n_prompts = 5
+max_scripts = 3
+min_characters_per_script = 1
+print_responses = false
+
+[scorer.GibberishRate.prompts]
+dataset = &quot;mlabonne/harmless_alpaca&quot;
+split = &quot;test[:100]&quot;
+column = &quot;text&quot;</pre></section><section class="article-section"><h2 class="section-title">Setup prompt</h2><pre class="code-block">Add a gibberish guardrail to my local Heretic setup. The community config uses a scorer named GibberishRate with settings n_prompts = 5, max_scripts = 3, min_characters_per_script = 1, and print_responses = false, with prompts from mlabonne/harmless_alpaca split test[:100]. No source file was published, so first check whether a GibberishRate class exists in my checkout or in a plugin I already have. If it does, register it with optimization = none so it skips bad trials without adding an optimization objective, and add the settings above under [scorer.GibberishRate]. If no implementation exists, stop and tell me that this entry needs a plugin class rather than inventing one. Verify with a short ARA run and confirm the probe prompts are evaluated before trial selection.</pre></section></div></div>
     </main>
   </div>
 

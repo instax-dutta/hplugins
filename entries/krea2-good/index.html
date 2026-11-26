@@ -3,16 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>hplugins - Community-built Heretic plugins and scorers</title>
-  <meta name="description" content="A curated index of community-built Heretic scorers, modifiers, configs, and models. Each entry includes source links, a usage guide, and a copy-paste setup prompt.">
-  <meta name="site-root" content="../../">
+  <title>Krea2Good - hplugins</title>
+  <meta name="description" content="Minimizes the p90 drift of good image prompts so an ablation leaves benign Krea 2 conditioning stable.">
+    <link rel="canonical" href="https://hplugins.sdad.pro/entries/krea2-good/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="hplugins">
+  <meta property="og:title" content="Krea2Good - hplugins">
+  <meta property="og:description" content="Minimizes the p90 drift of good image prompts so an ablation leaves benign Krea 2 conditioning stable.">
+  <meta property="og:url" content="https://hplugins.sdad.pro/entries/krea2-good/">
+  <meta property="og:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Krea2Good - hplugins">
+  <meta name="twitter:description" content="Minimizes the p90 drift of good image prompts so an ablation leaves benign Krea 2 conditioning stable.">
+  <meta name="twitter:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Krea2Good", "description": "Minimizes the p90 drift of good image prompts so an ablation leaves benign Krea 2 conditioning stable.", "author": {"@type": "Person", "name": "zubzer0"}, "keywords": "scorer, krea2, qwen3-vl, image, minimize", "inLanguage": "en", "mainEntityOfPage": "https://hplugins.sdad.pro/entries/krea2-good/", "isPartOf": {"@type": "WebSite", "name": "hplugins", "url": "https://hplugins.sdad.pro/"}, "citation": ["https://discord.com/channels/1447831134212984903/1447845008534405270"]}</script>
+    <meta name="site-root" content="../../">
   <meta name="entry-slug" content="krea2-good">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#EDEFF1">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../../assets/fonts/archivo-400-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../../assets/css/site.css?v=5">
+  <link rel="stylesheet" href="../../assets/css/site.css?v=6">
   <script>
     // Applied before paint so the plate never flashes the wrong theme.
     (function () {
@@ -23,7 +35,7 @@
       } catch (e) {}
     })();
   </script>
-  <script src="../../assets/js/app.js?v=5" defer></script>
+  <script src="../../assets/js/app.js?v=6" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -55,7 +67,16 @@
     </aside>
 
     <main class="main" id="main">
-      <div id="view" aria-live="polite"></div>
+      <div id="view" aria-live="polite"><div class="article"><a class="crumb" href="../../">&larr; back to index</a><h1 class="article-title">Krea2Good</h1><p class="article-meta">/scorer - by zubzer0 - community</p><p class="article-lead">Minimizes the p90 drift of good image prompts so an ablation leaves benign Krea 2 conditioning stable.</p><section class="article-section"><h2 class="section-title">What it does</h2><p class="prose">The first half of a paired scorer for image-generating VLMs. It takes the largest conditioning drift left after discarding the ten percent of prompts that moved most, then asks the optimizer to minimize it. Lower values mean the good prompts kept their original trajectory. Use it together with Krea2Bad and a KL divergence scorer.</p></section><section class="article-section"><h2 class="section-title">Where to find it</h2><ul class="link-list"><li><a href="https://discord.com/channels/1447831134212984903/1447845008534405270">Discord post with config</a></li><li><a href="../../plugins/krea2_drift_v2.py">Local plugin source</a></li></ul></section><section class="article-section"><h2 class="section-title">How to use it</h2><ol class="steps"><li>Copy plugins/krea2_drift_v2.py into the directory you run Heretic from.</li><li>Add the Krea2Good and Krea2Bad entries to scorers, with Krea2Good set to minimize.</li><li>Point [scorer.Krea2Good.prompts] at a file of good image prompts and keep a KL divergence scorer in the list.</li><li>Compare the reported &#x27;Krea2 good p90max&#x27; across trials; it should stay low while Krea2Bad rises.</li></ol></section><section class="article-section"><h2 class="section-title">Config fragment</h2><pre class="code-block">{ plugin = &quot;./krea2_drift_v2.py:Krea2Good&quot;, optimization = &quot;minimize&quot; },
+
+[scorer.Krea2Good]
+checkpoint_path = &quot;Krea2_turbo_bf16.safetensors&quot;
+max_length = 512
+noise_limit = 0.01
+
+[scorer.Krea2Good.prompts]
+dataset = &quot;GOOD_prompts.txt&quot;
+split = &quot;[:200]&quot;</pre></section><section class="article-section"><h2 class="section-title">Setup prompt</h2><pre class="code-block">Install the Krea2Good scorer in my Heretic working directory. Copy plugins/krea2_drift_v2.py into your Heretic working directory as krea2_drift_v2.py. Add { plugin = &quot;./krea2_drift_v2.py:Krea2Good&quot;, optimization = &quot;minimize&quot; } to the scorers list, keep a KLDivergence entry set to minimize, and add the matching Krea2Bad entry set to maximize. In [scorer.Krea2Good] set checkpoint_path to my local Krea 2 Turbo safetensors file, max_length = 512, measure_noise_floor = true, noise_limit = 0.01. In [scorer.Krea2Good.prompts] set dataset to a local good-image-prompt text file and split = &quot;[:200]&quot;. This scorer measures conditioning drift, so use a Qwen3-VL model and keep the KL score low to avoid breaking the model. Verify with a short trial run and confirm a &#x27;Krea2 good p90max&#x27; line in the output. Do not edit other scorers or the plugin code.</pre></section></div></div>
     </main>
   </div>
 

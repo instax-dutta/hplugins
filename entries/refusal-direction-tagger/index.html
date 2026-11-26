@@ -3,16 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>hplugins - Community-built Heretic plugins and scorers</title>
-  <meta name="description" content="A curated index of community-built Heretic scorers, modifiers, configs, and models. Each entry includes source links, a usage guide, and a copy-paste setup prompt.">
-  <meta name="site-root" content="../../">
+  <title>Refusal-direction scorer/tagger - hplugins</title>
+  <meta name="description" content="Detects refusals by comparing initial refusal directions with response hidden states instead of keyword lists.">
+    <link rel="canonical" href="https://hplugins.sdad.pro/entries/refusal-direction-tagger/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="hplugins">
+  <meta property="og:title" content="Refusal-direction scorer/tagger - hplugins">
+  <meta property="og:description" content="Detects refusals by comparing initial refusal directions with response hidden states instead of keyword lists.">
+  <meta property="og:url" content="https://hplugins.sdad.pro/entries/refusal-direction-tagger/">
+  <meta property="og:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Refusal-direction scorer/tagger - hplugins">
+  <meta name="twitter:description" content="Detects refusals by comparing initial refusal directions with response hidden states instead of keyword lists.">
+  <meta name="twitter:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Refusal-direction scorer/tagger", "description": "Detects refusals by comparing initial refusal directions with response hidden states instead of keyword lists.", "author": {"@type": "Person", "name": "us_beast_1"}, "keywords": "scorer, tagger, refusal-direction, activations, research", "inLanguage": "en", "mainEntityOfPage": "https://hplugins.sdad.pro/entries/refusal-direction-tagger/", "isPartOf": {"@type": "WebSite", "name": "hplugins", "url": "https://hplugins.sdad.pro/"}, "citation": ["https://github.com/p-e-w/heretic/pull/53", "https://arxiv.org/abs/2506.00085"]}</script>
+    <meta name="site-root" content="../../">
   <meta name="entry-slug" content="refusal-direction-tagger">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#EDEFF1">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../../assets/fonts/archivo-400-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../../assets/css/site.css?v=5">
+  <link rel="stylesheet" href="../../assets/css/site.css?v=6">
   <script>
     // Applied before paint so the plate never flashes the wrong theme.
     (function () {
@@ -23,7 +35,7 @@
       } catch (e) {}
     })();
   </script>
-  <script src="../../assets/js/app.js?v=5" defer></script>
+  <script src="../../assets/js/app.js?v=6" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -55,7 +67,9 @@
     </aside>
 
     <main class="main" id="main">
-      <div id="view" aria-live="polite"></div>
+      <div id="view" aria-live="polite"><div class="article"><a class="crumb" href="../../">&larr; back to index</a><h1 class="article-title">Refusal-direction scorer/tagger</h1><p class="article-meta">/scorer - by us_beast_1 - proof-of-concept</p><p class="article-lead">Detects refusals by comparing initial refusal directions with response hidden states instead of keyword lists.</p><section class="article-section"><h2 class="section-title">What it does</h2><p class="prose">An early plugin-branch experiment from the Heretic contributor working on the plugin system. It compares the model&#x27;s refusal direction with hidden states at the generated response, inspired by activation-steering research. It was tested on a small Gemma 3 model and remained a development branch rather than a published plugin.</p></section><section class="article-section"><h2 class="section-title">Where to find it</h2><ul class="link-list"><li><a href="https://github.com/p-e-w/heretic/pull/53">Plugin system PR</a></li><li><a href="https://arxiv.org/abs/2506.00085">Referenced steering paper</a></li></ul></section><section class="article-section"><h2 class="section-title">How to use it</h2><ol class="steps"><li>Read the plugin PR discussion before attempting this; the scorer/tagger API changed during development.</li><li>If you have a compatible plugin branch, register the detector with optimization = minimize.</li><li>Use a model where the refusal direction can be computed with your available memory.</li><li>Validate its verdicts against printed responses before trusting the score.</li></ol></section><section class="article-section"><h2 class="section-title">Config fragment</h2><pre class="code-block">scorers = [
+    { plugin = &quot;./refusal_detector.py:RefusalDetector&quot;, optimization = &quot;minimize&quot; },
+]</pre></section><section class="article-section"><h2 class="section-title">Setup prompt</h2><pre class="code-block">Try the refusal-direction detector approach from us_beast_1&#x27;s early Heretic plugin branch in my local setup. It compares initial refusal directions with response hidden states rather than matching keywords. Before changing any config, check whether my Heretic version has the scorer/tagger plugin interface this needs and whether the detector code is available. If it is not, report that clearly instead of inventing a class. If it is, register it with optimization = minimize and keep KLDivergence in the list. Validate on a small sample by printing responses and comparing the detector verdict with an obvious refusal. Do not change model weights or other scorers.</pre></section></div></div>
     </main>
   </div>
 

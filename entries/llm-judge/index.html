@@ -3,16 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>hplugins - Community-built Heretic plugins and scorers</title>
-  <meta name="description" content="A curated index of community-built Heretic scorers, modifiers, configs, and models. Each entry includes source links, a usage guide, and a copy-paste setup prompt.">
-  <meta name="site-root" content="../../">
+  <title>LLM Judge scorer - hplugins</title>
+  <meta name="description" content="Uses a separate language model to decide whether a response actually complies, instead of matching refusal keywords.">
+    <link rel="canonical" href="https://hplugins.sdad.pro/entries/llm-judge/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="hplugins">
+  <meta property="og:title" content="LLM Judge scorer - hplugins">
+  <meta property="og:description" content="Uses a separate language model to decide whether a response actually complies, instead of matching refusal keywords.">
+  <meta property="og:url" content="https://hplugins.sdad.pro/entries/llm-judge/">
+  <meta property="og:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="LLM Judge scorer - hplugins">
+  <meta name="twitter:description" content="Uses a separate language model to decide whether a response actually complies, instead of matching refusal keywords.">
+  <meta name="twitter:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "LLM Judge scorer", "description": "Uses a separate language model to decide whether a response actually complies, instead of matching refusal keywords.", "author": {"@type": "Person", "name": "kurigohanandkamehameha"}, "keywords": "scorer, llm-judge, refusals, api, pr", "inLanguage": "en", "mainEntityOfPage": "https://hplugins.sdad.pro/entries/llm-judge/", "isPartOf": {"@type": "WebSite", "name": "hplugins", "url": "https://hplugins.sdad.pro/"}, "citation": ["https://github.com/p-e-w/heretic/pull/53", "https://github.com/p-e-w/heretic/blob/master/src/heretic/scorer.py"]}</script>
+    <meta name="site-root" content="../../">
   <meta name="entry-slug" content="llm-judge">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#EDEFF1">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../../assets/fonts/archivo-400-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../../assets/css/site.css?v=5">
+  <link rel="stylesheet" href="../../assets/css/site.css?v=6">
   <script>
     // Applied before paint so the plate never flashes the wrong theme.
     (function () {
@@ -23,7 +35,7 @@
       } catch (e) {}
     })();
   </script>
-  <script src="../../assets/js/app.js?v=5" defer></script>
+  <script src="../../assets/js/app.js?v=6" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -55,7 +67,10 @@
     </aside>
 
     <main class="main" id="main">
-      <div id="view" aria-live="polite"></div>
+      <div id="view" aria-live="polite"><div class="article"><a class="crumb" href="../../">&larr; back to index</a><h1 class="article-title">LLM Judge scorer</h1><p class="article-meta">/scorer - by kurigohanandkamehameha - proof-of-concept</p><p class="article-lead">Uses a separate language model to decide whether a response actually complies, instead of matching refusal keywords.</p><section class="article-section"><h2 class="section-title">What it does</h2><p class="prose">A pull request that sends responses to a judge model through an OpenAI-compatible API and classifies them. It was motivated by thinking models that refuse inside the reasoning trace and by unusual refusal formats that keyword lists miss. The author found that running the judge as an external API client worked better than loading it inside the Heretic process.</p></section><section class="article-section"><h2 class="section-title">Where to find it</h2><ul class="link-list"><li><a href="https://github.com/p-e-w/heretic/pull/53">Plugin system PR discussion</a></li><li><a href="https://github.com/p-e-w/heretic/blob/master/src/heretic/scorer.py">Mainline scorer interface</a></li></ul></section><section class="article-section"><h2 class="section-title">How to use it</h2><ol class="steps"><li>Check whether the LLM judge PR has been adapted to your Heretic version; the plugin interface changed between 1.x and 2.x.</li><li>Configure a reachable OpenAI-compatible endpoint and a judge model with enough context for the full response.</li><li>Register the judge scorer with optimization = minimize so judged refusals go down.</li><li>Compare its verdicts against KeywordRate on a small response sample before a long run.</li></ol></section><section class="article-section"><h2 class="section-title">Config fragment</h2><pre class="code-block">scorers = [
+    { plugin = &quot;./llm_judge.py:LLMJudge&quot;, optimization = &quot;minimize&quot; },
+    { plugin = &quot;heretic.scorers.kl_divergence.KLDivergence&quot;, optimization = &quot;minimize&quot; },
+]</pre></section><section class="article-section"><h2 class="section-title">Setup prompt</h2><pre class="code-block">Add an LLM-based refusal judge to my local Heretic setup. The approach comes from kurigohanandkamehameha&#x27;s PR: responses are classified by a separate model through an OpenAI-compatible API, which helps with thinking models whose refusals appear in the reasoning trace. First check my Heretic version and whether an adapted judge plugin exists; the plugin interface changed between 1.x and 2.x. Configure the endpoint and model from my environment, register the judge scorer with optimization = minimize, and keep KLDivergence minimizing. Do not hardcode any API key. Verify by judging a small sample of responses and comparing the verdicts with KeywordRate before starting a full run.</pre></section></div></div>
     </main>
   </div>
 

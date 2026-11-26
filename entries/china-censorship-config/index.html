@@ -3,16 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>hplugins - Community-built Heretic plugins and scorers</title>
-  <meta name="description" content="A curated index of community-built Heretic scorers, modifiers, configs, and models. Each entry includes source links, a usage guide, and a copy-paste setup prompt.">
-  <meta name="site-root" content="../../">
+  <title>Chinese censorship config fork - hplugins</title>
+  <meta name="description" content="A Heretic fork with refusal markers and prompts aimed at region-specific Chinese censorship rather than general refusals.">
+    <link rel="canonical" href="https://hplugins.sdad.pro/entries/china-censorship-config/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="hplugins">
+  <meta property="og:title" content="Chinese censorship config fork - hplugins">
+  <meta property="og:description" content="A Heretic fork with refusal markers and prompts aimed at region-specific Chinese censorship rather than general refusals.">
+  <meta property="og:url" content="https://hplugins.sdad.pro/entries/china-censorship-config/">
+  <meta property="og:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Chinese censorship config fork - hplugins">
+  <meta name="twitter:description" content="A Heretic fork with refusal markers and prompts aimed at region-specific Chinese censorship rather than general refusals.">
+  <meta name="twitter:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Chinese censorship config fork", "description": "A Heretic fork with refusal markers and prompts aimed at region-specific Chinese censorship rather than general refusals.", "author": {"@type": "Person", "name": "benjamin920101"}, "keywords": "config, chinese, censorship, keywords, fork", "inLanguage": "en", "mainEntityOfPage": "https://hplugins.sdad.pro/entries/china-censorship-config/", "isPartOf": {"@type": "WebSite", "name": "hplugins", "url": "https://hplugins.sdad.pro/"}, "citation": ["https://github.com/benjamin920101/heretic-china-censorship", "https://github.com/benjamin920101/heretic-china-censorship/blob/master/config.default.toml"]}</script>
+    <meta name="site-root" content="../../">
   <meta name="entry-slug" content="china-censorship-config">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#EDEFF1">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../../assets/fonts/archivo-400-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../../assets/css/site.css?v=5">
+  <link rel="stylesheet" href="../../assets/css/site.css?v=6">
   <script>
     // Applied before paint so the plate never flashes the wrong theme.
     (function () {
@@ -23,7 +35,7 @@
       } catch (e) {}
     })();
   </script>
-  <script src="../../assets/js/app.js?v=5" defer></script>
+  <script src="../../assets/js/app.js?v=6" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -55,7 +67,12 @@
     </aside>
 
     <main class="main" id="main">
-      <div id="view" aria-live="polite"></div>
+      <div id="view" aria-live="polite"><div class="article"><a class="crumb" href="../../">&larr; back to index</a><h1 class="article-title">Chinese censorship config fork</h1><p class="article-meta">/config - by benjamin920101 - community</p><p class="article-lead">A Heretic fork with refusal markers and prompts aimed at region-specific Chinese censorship rather than general refusals.</p><section class="article-section"><h2 class="section-title">What it does</h2><p class="prose">Shared in the community server as a working configuration fork. It changes the refusal markers and dataset setup so the optimization targets censorship behavior specific to Chinese-language prompts. Treat it as a starting config to adapt, not a drop-in plugin.</p></section><section class="article-section"><h2 class="section-title">Where to find it</h2><ul class="link-list"><li><a href="https://github.com/benjamin920101/heretic-china-censorship">Fork on GitHub</a></li><li><a href="https://github.com/benjamin920101/heretic-china-censorship/blob/master/config.default.toml">Config file</a></li></ul></section><section class="article-section"><h2 class="section-title">How to use it</h2><ol class="steps"><li>Copy the fork&#x27;s config.default.toml into your Heretic working directory as config.toml.</li><li>Review the KeywordRate markers and translate or extend them for your target prompts.</li><li>Point the good and bad prompt datasets at Chinese-language data you actually want to preserve or change.</li><li>Run a short trial set and read printed responses to confirm the markers fire correctly.</li></ol></section><section class="article-section"><h2 class="section-title">Config fragment</h2><pre class="code-block">[scorer.KeywordRate]
+# Use the markers from the fork&#x27;s config.default.toml
+
+[modifier.ARA.bad_prompts]
+dataset = &quot;your-chinese-language-dataset&quot;
+column = &quot;text&quot;</pre></section><section class="article-section"><h2 class="section-title">Setup prompt</h2><pre class="code-block">Adapt benjamin920101&#x27;s Chinese censorship Heretic config in my local installation. Read https://github.com/benjamin920101/heretic-china-censorship/blob/master/config.default.toml and copy its refusal markers and prompt dataset settings into my config.toml, preserving any model-specific settings I already have. Do not blindly overwrite my config: merge the KeywordRate markers and the bad_prompts dataset, and keep my existing scorer list. Then run a short trial and print a few responses to verify the markers match the censorship behavior I care about. Tell me which markers were added so I can review them.</pre></section></div></div>
     </main>
   </div>
 

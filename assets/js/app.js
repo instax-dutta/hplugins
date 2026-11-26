@@ -295,6 +295,7 @@
   }
 
   function showSkeleton() {
+    if (view.firstElementChild) return;
     view.innerHTML = '<div class="skeleton-line"></div><div class="skeleton-line"></div>' +
       '<div class="skeleton-line"></div>';
   }
@@ -305,7 +306,6 @@
       renderCatalog();
       return;
     }
-    showSkeleton();
     getCatalog().then(function (catalog) { renderDetail(current.slug, catalog); })
       .catch(function (error) { showError(error.message); });
   }

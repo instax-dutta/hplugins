@@ -3,16 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>hplugins - Community-built Heretic plugins and scorers</title>
-  <meta name="description" content="A curated index of community-built Heretic scorers, modifiers, configs, and models. Each entry includes source links, a usage guide, and a copy-paste setup prompt.">
-  <meta name="site-root" content="../../">
+  <title>Emotion steering config - hplugins</title>
+  <meta name="description" content="An official non-default config that steers emotions by minimizing negative and maximizing positive labels.">
+    <link rel="canonical" href="https://hplugins.sdad.pro/entries/emotions-config/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="hplugins">
+  <meta property="og:title" content="Emotion steering config - hplugins">
+  <meta property="og:description" content="An official non-default config that steers emotions by minimizing negative and maximizing positive labels.">
+  <meta property="og:url" content="https://hplugins.sdad.pro/entries/emotions-config/">
+  <meta property="og:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Emotion steering config - hplugins">
+  <meta name="twitter:description" content="An official non-default config that steers emotions by minimizing negative and maximizing positive labels.">
+  <meta name="twitter:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Emotion steering config", "description": "An official non-default config that steers emotions by minimizing negative and maximizing positive labels.", "author": {"@type": "Person", "name": "p-e-w"}, "keywords": "config, emotions, bertclassifier, steering, official", "inLanguage": "en", "mainEntityOfPage": "https://hplugins.sdad.pro/entries/emotions-config/", "isPartOf": {"@type": "WebSite", "name": "hplugins", "url": "https://hplugins.sdad.pro/"}, "citation": ["https://github.com/p-e-w/heretic/blob/master/config.emotions.toml", "https://github.com/p-e-w/heretic/blob/master/config.default.toml"]}</script>
+    <meta name="site-root" content="../../">
   <meta name="entry-slug" content="emotions-config">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#EDEFF1">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../../assets/fonts/archivo-400-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../../assets/css/site.css?v=5">
+  <link rel="stylesheet" href="../../assets/css/site.css?v=6">
   <script>
     // Applied before paint so the plate never flashes the wrong theme.
     (function () {
@@ -23,7 +35,7 @@
       } catch (e) {}
     })();
   </script>
-  <script src="../../assets/js/app.js?v=5" defer></script>
+  <script src="../../assets/js/app.js?v=6" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -55,7 +67,11 @@
     </aside>
 
     <main class="main" id="main">
-      <div id="view" aria-live="polite"></div>
+      <div id="view" aria-live="polite"><div class="article"><a class="crumb" href="../../">&larr; back to index</a><h1 class="article-title">Emotion steering config</h1><p class="article-meta">/config - by p-e-w - available</p><p class="article-lead">An official non-default config that steers emotions by minimizing negative and maximizing positive labels.</p><section class="article-section"><h2 class="section-title">What it does</h2><p class="prose">Uses two instances of BERTClassifier with a DistilRoBERTa emotion model, plus KL divergence. One instance minimizes negative emotions and another maximizes positive ones, giving a concrete example of how multiple instances of the same scorer can co-optimize opposite directions. It ships in the repository but is not the default.</p></section><section class="article-section"><h2 class="section-title">Where to find it</h2><ul class="link-list"><li><a href="https://github.com/p-e-w/heretic/blob/master/config.emotions.toml">Config file</a></li><li><a href="https://github.com/p-e-w/heretic/blob/master/config.default.toml">Default config reference</a></li></ul></section><section class="article-section"><h2 class="section-title">How to use it</h2><ol class="steps"><li>Copy config.emotions.toml to config.toml in your Heretic working directory.</li><li>Edit the two emotion label sets to match the classes of the classifier model you use.</li><li>Choose prompts that naturally evoke the emotion you want to change.</li><li>Run a short trial set and inspect responses before committing to a long run.</li></ol></section><section class="article-section"><h2 class="section-title">Config fragment</h2><pre class="code-block">scorers = [
+    { plugin = &quot;heretic.scorers.kl_divergence.KLDivergence&quot;, optimization = &quot;minimize&quot; },
+    { plugin = &quot;heretic.scorers.bert_classifier.BERTClassifier&quot;, optimization = &quot;minimize&quot;, instance_name = &quot;negative_emotions&quot; },
+    { plugin = &quot;heretic.scorers.bert_classifier.BERTClassifier&quot;, optimization = &quot;maximize&quot;, instance_name = &quot;positive_emotions&quot; },
+]</pre></section><section class="article-section"><h2 class="section-title">Setup prompt</h2><pre class="code-block">Install the official emotion-steering configuration in my local Heretic working directory. Copy config.emotions.toml to config.toml, but first back up my current config. Confirm the three scorer entries are present: KLDivergence minimizing, BERTClassifier instance negative_emotions minimizing, and BERTClassifier instance positive_emotions maximizing, each with its own [scorer.BERTClassifier_&lt;instance_name&gt;] section. Check that the label lists match the classifier model named in the config, and edit them if my chosen model has different labels. Choose prompts that evoke the target emotion. Verify by starting a short run and confirming all three scorers load with their instance names printed.</pre></section></div></div>
     </main>
   </div>
 

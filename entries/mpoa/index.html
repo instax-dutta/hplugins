@@ -3,16 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>hplugins - Community-built Heretic plugins and scorers</title>
-  <meta name="description" content="A curated index of community-built Heretic scorers, modifiers, configs, and models. Each entry includes source links, a usage guide, and a copy-paste setup prompt.">
-  <meta name="site-root" content="../../">
+  <title>MPOA abliteration - hplugins</title>
+  <meta name="description" content="Magnitude-preserving orthogonal ablation, available through Heretic&#x27;s directional abliteration modifier.">
+    <link rel="canonical" href="https://hplugins.sdad.pro/entries/mpoa/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="hplugins">
+  <meta property="og:title" content="MPOA abliteration - hplugins">
+  <meta property="og:description" content="Magnitude-preserving orthogonal ablation, available through Heretic&#x27;s directional abliteration modifier.">
+  <meta property="og:url" content="https://hplugins.sdad.pro/entries/mpoa/">
+  <meta property="og:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MPOA abliteration - hplugins">
+  <meta name="twitter:description" content="Magnitude-preserving orthogonal ablation, available through Heretic&#x27;s directional abliteration modifier.">
+  <meta name="twitter:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "MPOA abliteration", "description": "Magnitude-preserving orthogonal ablation, available through Heretic's directional abliteration modifier.", "author": {"@type": "Person", "name": "p-e-w and contributors"}, "keywords": "modifier, abliteration, mpoa, orthogonal, norm", "inLanguage": "en", "mainEntityOfPage": "https://hplugins.sdad.pro/entries/mpoa/", "isPartOf": {"@type": "WebSite", "name": "hplugins", "url": "https://hplugins.sdad.pro/"}, "citation": ["https://github.com/p-e-w/heretic/pull/52", "https://github.com/p-e-w/heretic/blob/master/src/heretic/modifiers/abliteration.py"]}</script>
+    <meta name="site-root" content="../../">
   <meta name="entry-slug" content="mpoa">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#EDEFF1">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../../assets/fonts/archivo-400-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../../assets/css/site.css?v=5">
+  <link rel="stylesheet" href="../../assets/css/site.css?v=6">
   <script>
     // Applied before paint so the plate never flashes the wrong theme.
     (function () {
@@ -23,7 +35,7 @@
       } catch (e) {}
     })();
   </script>
-  <script src="../../assets/js/app.js?v=5" defer></script>
+  <script src="../../assets/js/app.js?v=6" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -55,7 +67,12 @@
     </aside>
 
     <main class="main" id="main">
-      <div id="view" aria-live="polite"></div>
+      <div id="view" aria-live="polite"><div class="article"><a class="crumb" href="../../">&larr; back to index</a><h1 class="article-title">MPOA abliteration</h1><p class="article-meta">/modifier - by p-e-w and contributors - available</p><p class="article-lead">Magnitude-preserving orthogonal ablation, available through Heretic&#x27;s directional abliteration modifier.</p><section class="article-section"><h2 class="section-title">What it does</h2><p class="prose">A modifier technique that preserves norm and uses orthogonal directions during abliteration. It began as a community pull request and is now supported by the shipped Abliteration modifier through settings such as row normalization and orthogonalize-direction. Community reports suggest it helps many models, but the maintainer notes that Heretic&#x27;s parameter search plus MPOA beats the original MPOA parameter strategy.</p></section><section class="article-section"><h2 class="section-title">Where to find it</h2><ul class="link-list"><li><a href="https://github.com/p-e-w/heretic/pull/52">Original PR discussion</a></li><li><a href="https://github.com/p-e-w/heretic/blob/master/src/heretic/modifiers/abliteration.py">Abliteration source</a></li></ul></section><section class="article-section"><h2 class="section-title">How to use it</h2><ol class="steps"><li>Switch the modifiers list to heretic.modifiers.abliteration.Abliteration.</li><li>Enable the MPOA-related flags under [modifier.Abliteration] in config.toml.</li><li>Keep a quality scorer such as KL divergence or a benchmark active so parameter search has a signal.</li><li>Compare against ARA on the same model before choosing.</li></ol></section><section class="article-section"><h2 class="section-title">Config fragment</h2><pre class="code-block">modifiers = [
+    { plugin = &quot;heretic.modifiers.abliteration.Abliteration&quot; },
+]
+
+# MPOA-related flags from the PR discussion:
+# --winsorization-quantile=0.995 --row-normalization=full --orthogonalize-direction</pre></section><section class="article-section"><h2 class="section-title">Setup prompt</h2><pre class="code-block">Enable MPOA-style directional abliteration in my local Heretic installation. Check my Heretic version first because the modifier plugin interface changed in 2.x. Set the modifiers list to { plugin = &quot;heretic.modifiers.abliteration.Abliteration&quot; } and look up the exact current setting names for winsorization quantile, row normalization, and orthogonalize direction in the shipped config and modifier source; do not guess flag names. Apply the values discussed in PR 52 only if those settings exist in my version, and keep KL divergence or a benchmark scorer active so the optimizer has a quality signal. Verify by starting a short run and confirming the loaded modifier is Abliteration and the MPOA settings appear in the printed config.</pre></section></div></div>
     </main>
   </div>
 

@@ -3,16 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>hplugins - Community-built Heretic plugins and scorers</title>
-  <meta name="description" content="A curated index of community-built Heretic scorers, modifiers, configs, and models. Each entry includes source links, a usage guide, and a copy-paste setup prompt.">
-  <meta name="site-root" content="../../">
+  <title>Krea2Bad - hplugins</title>
+  <meta name="description" content="Maximizes the p90 drift of bad image prompts so abliteration visibly changes how the model handles them.">
+    <link rel="canonical" href="https://hplugins.sdad.pro/entries/krea2-bad/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="hplugins">
+  <meta property="og:title" content="Krea2Bad - hplugins">
+  <meta property="og:description" content="Maximizes the p90 drift of bad image prompts so abliteration visibly changes how the model handles them.">
+  <meta property="og:url" content="https://hplugins.sdad.pro/entries/krea2-bad/">
+  <meta property="og:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Krea2Bad - hplugins">
+  <meta name="twitter:description" content="Maximizes the p90 drift of bad image prompts so abliteration visibly changes how the model handles them.">
+  <meta name="twitter:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Krea2Bad", "description": "Maximizes the p90 drift of bad image prompts so abliteration visibly changes how the model handles them.", "author": {"@type": "Person", "name": "zubzer0"}, "keywords": "scorer, krea2, qwen3-vl, image, maximize", "inLanguage": "en", "mainEntityOfPage": "https://hplugins.sdad.pro/entries/krea2-bad/", "isPartOf": {"@type": "WebSite", "name": "hplugins", "url": "https://hplugins.sdad.pro/"}, "citation": ["https://discord.com/channels/1447831134212984903/1447845008534405270"]}</script>
+    <meta name="site-root" content="../../">
   <meta name="entry-slug" content="krea2-bad">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#EDEFF1">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../../assets/fonts/archivo-400-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../../assets/css/site.css?v=5">
+  <link rel="stylesheet" href="../../assets/css/site.css?v=6">
   <script>
     // Applied before paint so the plate never flashes the wrong theme.
     (function () {
@@ -23,7 +35,7 @@
       } catch (e) {}
     })();
   </script>
-  <script src="../../assets/js/app.js?v=5" defer></script>
+  <script src="../../assets/js/app.js?v=6" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -55,7 +67,16 @@
     </aside>
 
     <main class="main" id="main">
-      <div id="view" aria-live="polite"></div>
+      <div id="view" aria-live="polite"><div class="article"><a class="crumb" href="../../">&larr; back to index</a><h1 class="article-title">Krea2Bad</h1><p class="article-meta">/scorer - by zubzer0 - community</p><p class="article-lead">Maximizes the p90 drift of bad image prompts so abliteration visibly changes how the model handles them.</p><section class="article-section"><h2 class="section-title">What it does</h2><p class="prose">The second half of the paired Krea 2 scorer. It keeps the smallest conditioning drift after discarding the ten percent of prompts that moved least, then maximizes it. The author&#x27;s sign of success is Krea2Bad p90min rising above Krea2Good p90max. It correlates with refusal rate on image prompts, so it is useful only alongside a quality scorer such as KL divergence.</p></section><section class="article-section"><h2 class="section-title">Where to find it</h2><ul class="link-list"><li><a href="https://discord.com/channels/1447831134212984903/1447845008534405270">Discord post with config</a></li><li><a href="../../plugins/krea2_drift_v2.py">Local plugin source</a></li></ul></section><section class="article-section"><h2 class="section-title">How to use it</h2><ol class="steps"><li>Copy plugins/krea2_drift_v2.py into your Heretic working directory as krea2_drift_v2.py and pair this scorer with Krea2Good.</li><li>Point [scorer.Krea2Bad.prompts] at a file of bad or restricted image prompts.</li><li>Set optimization = maximize and keep KLDivergence minimizing.</li><li>Look for Krea2 bad p90min above Krea2 good p90max as the intended result.</li></ol></section><section class="article-section"><h2 class="section-title">Config fragment</h2><pre class="code-block">{ plugin = &quot;./krea2_drift_v2.py:Krea2Bad&quot;, optimization = &quot;maximize&quot; },
+
+[scorer.Krea2Bad]
+checkpoint_path = &quot;Krea2_turbo_bf16.safetensors&quot;
+max_length = 512
+noise_limit = 0.01
+
+[scorer.Krea2Bad.prompts]
+dataset = &quot;BAD_prompts.txt&quot;
+split = &quot;[:200]&quot;</pre></section><section class="article-section"><h2 class="section-title">Setup prompt</h2><pre class="code-block">Install the Krea2Bad scorer in my Heretic working directory. Copy plugins/krea2_drift_v2.py into your Heretic working directory as krea2_drift_v2.py and add { plugin = &quot;./krea2_drift_v2.py:Krea2Bad&quot;, optimization = &quot;maximize&quot; } to the scorers list. Pair it with { plugin = &quot;./krea2_drift_v2.py:Krea2Good&quot;, optimization = &quot;minimize&quot; } and with KLDivergence set to minimize. In [scorer.Krea2Bad] set checkpoint_path to my local Krea 2 Turbo safetensors file, max_length = 512, and noise_limit = 0.01. In [scorer.Krea2Bad.prompts] use a local file of restricted image prompts and split = &quot;[:200]&quot;. The plugin is prompt-sensitive, so keep the KL score low and watch for a broken model. Verify by running a short trial and checking that a &#x27;Krea2 bad p90min&#x27; line is printed and that it can exceed the good score. Do not modify other scorers.</pre></section></div></div>
     </main>
   </div>
 

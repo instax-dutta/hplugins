@@ -3,16 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>hplugins - Community-built Heretic plugins and scorers</title>
-  <meta name="description" content="A curated index of community-built Heretic scorers, modifiers, configs, and models. Each entry includes source links, a usage guide, and a copy-paste setup prompt.">
-  <meta name="site-root" content="../../">
+  <title>SOMA modifier - hplugins</title>
+  <meta name="description" content="A planned multi-directional modifier intended to sit alongside ARA as a shipped plugin.">
+    <link rel="canonical" href="https://hplugins.sdad.pro/entries/soma-modifier/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="hplugins">
+  <meta property="og:title" content="SOMA modifier - hplugins">
+  <meta property="og:description" content="A planned multi-directional modifier intended to sit alongside ARA as a shipped plugin.">
+  <meta property="og:url" content="https://hplugins.sdad.pro/entries/soma-modifier/">
+  <meta property="og:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SOMA modifier - hplugins">
+  <meta name="twitter:description" content="A planned multi-directional modifier intended to sit alongside ARA as a shipped plugin.">
+  <meta name="twitter:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "SOMA modifier", "description": "A planned multi-directional modifier intended to sit alongside ARA as a shipped plugin.", "author": {"@type": "Person", "name": "p-e-w and contributors"}, "keywords": "modifier, soma, ara, planned, transport", "inLanguage": "en", "mainEntityOfPage": "https://hplugins.sdad.pro/entries/soma-modifier/", "isPartOf": {"@type": "WebSite", "name": "hplugins", "url": "https://hplugins.sdad.pro/"}, "citation": ["https://github.com/p-e-w/heretic/pull/53", "https://github.com/p-e-w/heretic/blob/master/src/heretic/modifier.py"]}</script>
+    <meta name="site-root" content="../../">
   <meta name="entry-slug" content="soma-modifier">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#EDEFF1">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../../assets/fonts/archivo-400-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../../assets/css/site.css?v=5">
+  <link rel="stylesheet" href="../../assets/css/site.css?v=6">
   <script>
     // Applied before paint so the plate never flashes the wrong theme.
     (function () {
@@ -23,7 +35,7 @@
       } catch (e) {}
     })();
   </script>
-  <script src="../../assets/js/app.js?v=5" defer></script>
+  <script src="../../assets/js/app.js?v=6" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -55,7 +67,10 @@
     </aside>
 
     <main class="main" id="main">
-      <div id="view" aria-live="polite"></div>
+      <div id="view" aria-live="polite"><div class="article"><a class="crumb" href="../../">&larr; back to index</a><h1 class="article-title">SOMA modifier</h1><p class="article-meta">/modifier - by p-e-w and contributors - planned</p><p class="article-lead">A planned multi-directional modifier intended to sit alongside ARA as a shipped plugin.</p><section class="article-section"><h2 class="section-title">What it does</h2><p class="prose">The maintainer described SOMA as a multi-directional transport technique that uses a fixed number of linear paths. It is not released in the current master branch; the plugin interface was reworked specifically so techniques like SOMA can be added. List it here to track intent, not to install today.</p></section><section class="article-section"><h2 class="section-title">Where to find it</h2><ul class="link-list"><li><a href="https://github.com/p-e-w/heretic/pull/53">Plugin system PR</a></li><li><a href="https://github.com/p-e-w/heretic/blob/master/src/heretic/modifier.py">Modifier interface</a></li></ul></section><section class="article-section"><h2 class="section-title">How to use it</h2><ol class="steps"><li>Check the current Heretic release notes before attempting anything; this is not shipped yet.</li><li>If a SOMA plugin appears, register it in the modifiers list in place of ARA.</li><li>Keep your quality scorer active and compare trials against ARA on the same model.</li><li>Do not copy ARA settings into SOMA without checking the new parameter schema.</li></ol></section><section class="article-section"><h2 class="section-title">Config fragment</h2><pre class="code-block"># Not released yet. When available, it will replace the ARA entry:
+modifiers = [
+    { plugin = &quot;heretic.modifiers.soma.SOMA&quot; },
+]</pre></section><section class="article-section"><h2 class="section-title">Setup prompt</h2><pre class="code-block">Check whether the SOMA modifier is available in my installed Heretic version and set it up only if it actually ships. Look in the installed heretic.modifiers package and in the current release notes; do not assume a class named SOMA exists. If it is present, replace the ARA entry in the modifiers list with the exact plugin path from the source, keep my quality scorer active, and read the modifier&#x27;s own config section before setting any parameters. If it is not present, report that SOMA is still planned and leave my config unchanged. Verify any change by starting a short run and confirming the loaded modifier name.</pre></section></div></div>
     </main>
   </div>
 

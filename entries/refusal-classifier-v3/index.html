@@ -3,16 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>hplugins - Community-built Heretic plugins and scorers</title>
-  <meta name="description" content="A curated index of community-built Heretic scorers, modifiers, configs, and models. Each entry includes source links, a usage guide, and a copy-paste setup prompt.">
-  <meta name="site-root" content="../../">
+  <title>Refusal Classifier V3 - hplugins</title>
+  <meta name="description" content="A family of refusal classifiers for BERTClassifier, published in small and large variants.">
+    <link rel="canonical" href="https://hplugins.sdad.pro/entries/refusal-classifier-v3/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="hplugins">
+  <meta property="og:title" content="Refusal Classifier V3 - hplugins">
+  <meta property="og:description" content="A family of refusal classifiers for BERTClassifier, published in small and large variants.">
+  <meta property="og:url" content="https://hplugins.sdad.pro/entries/refusal-classifier-v3/">
+  <meta property="og:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Refusal Classifier V3 - hplugins">
+  <meta name="twitter:description" content="A family of refusal classifiers for BERTClassifier, published in small and large variants.">
+  <meta name="twitter:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Refusal Classifier V3", "description": "A family of refusal classifiers for BERTClassifier, published in small and large variants.", "author": {"@type": "Person", "name": "VINAY-UMRETHE"}, "keywords": "model, classifier, bert, refusals, v3", "inLanguage": "en", "mainEntityOfPage": "https://hplugins.sdad.pro/entries/refusal-classifier-v3/", "isPartOf": {"@type": "WebSite", "name": "hplugins", "url": "https://hplugins.sdad.pro/"}, "citation": ["https://huggingface.co/VINAY-UMRETHE/Refusal-Classifier-V3-Small", "https://huggingface.co/VINAY-UMRETHE/Refusal-Classifier-V3-Large", "https://huggingface.co/VINAY-UMRETHE/Refusal-Classifier-V2"]}</script>
+    <meta name="site-root" content="../../">
   <meta name="entry-slug" content="refusal-classifier-v3">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#EDEFF1">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../../assets/fonts/archivo-400-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../../assets/css/site.css?v=5">
+  <link rel="stylesheet" href="../../assets/css/site.css?v=6">
   <script>
     // Applied before paint so the plate never flashes the wrong theme.
     (function () {
@@ -23,7 +35,7 @@
       } catch (e) {}
     })();
   </script>
-  <script src="../../assets/js/app.js?v=5" defer></script>
+  <script src="../../assets/js/app.js?v=6" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -55,7 +67,14 @@
     </aside>
 
     <main class="main" id="main">
-      <div id="view" aria-live="polite"></div>
+      <div id="view" aria-live="polite"><div class="article"><a class="crumb" href="../../">&larr; back to index</a><h1 class="article-title">Refusal Classifier V3</h1><p class="article-meta">/model - by VINAY-UMRETHE - available</p><p class="article-lead">A family of refusal classifiers for BERTClassifier, published in small and large variants.</p><section class="article-section"><h2 class="section-title">What it does</h2><p class="prose">Successor models to the V1 and V2 refusal classifiers commonly used with Heretic&#x27;s BERTClassifier scorer. The author reports a new non-compliant label and stress-test results for both sizes. The large variant is the more accurate of the two according to the author&#x27;s published tests; treat those numbers as author-reported, not independent benchmarks.</p></section><section class="article-section"><h2 class="section-title">Where to find it</h2><ul class="link-list"><li><a href="https://huggingface.co/VINAY-UMRETHE/Refusal-Classifier-V3-Small">V3 Small</a></li><li><a href="https://huggingface.co/VINAY-UMRETHE/Refusal-Classifier-V3-Large">V3 Large</a></li><li><a href="https://huggingface.co/VINAY-UMRETHE/Refusal-Classifier-V2">V2 model</a></li></ul></section><section class="article-section"><h2 class="section-title">How to use it</h2><ol class="steps"><li>Enable BERTClassifier in the scorers list with optimization = minimize.</li><li>Choose V3-Large for accuracy or V3-Small for lower memory use.</li><li>Set model to the full Hugging Face repository ID and match_labels to the labels named in that model&#x27;s card.</li><li>Run a small sample and compare verdicts against your previous classifier before switching fully.</li></ol></section><section class="article-section"><h2 class="section-title">Config fragment</h2><pre class="code-block">scorers = [
+    { plugin = &quot;heretic.scorers.bert_classifier.BERTClassifier&quot;, optimization = &quot;minimize&quot; },
+]
+
+[scorer.BERTClassifier]
+model = &quot;VINAY-UMRETHE/Refusal-Classifier-V3-Large&quot;
+match_labels = [&quot;full_refusal&quot;, &quot;partial_refusal&quot;, &quot;non_compliant&quot;]
+max_length = 512</pre></section><section class="article-section"><h2 class="section-title">Setup prompt</h2><pre class="code-block">Switch my local Heretic BERTClassifier scorer to VINAY-UMRETHE/Refusal-Classifier-V3-Large. Enable the BERTClassifier scorer with optimization = minimize if it is not already in the scorers list, and set model = &quot;VINAY-UMRETHE/Refusal-Classifier-V3-Large&quot; under [scorer.BERTClassifier]. Read the model&#x27;s Hugging Face card and use its exact label names for match_labels; do not guess labels from memory. Keep max_length = 512 and leave KLDivergence minimizing if it is present. Verify by starting a short Heretic run and confirming the model ID appears in the loaded-classifier log line, then compare the first trial&#x27;s refusal verdicts with my previous classifier.</pre></section></div></div>
     </main>
   </div>
 

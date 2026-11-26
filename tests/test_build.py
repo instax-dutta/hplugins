@@ -89,19 +89,44 @@ class IndexTests(unittest.TestCase):
 
 class EntryPageTests(unittest.TestCase):
     def test_generated_pages_match_shell(self):
-        pages = build.build_entry_pages(REAL)
+        pages = build.build_pages(REAL)[1]
         for slug, page in pages.items():
             target = ROOT / "entries" / slug / "index.html"
             self.assertTrue(target.is_file(), f"missing generated page for {slug}")
             self.assertEqual(target.read_text(encoding="utf-8"), page, f"stale page for {slug}")
 
     def test_generated_page_has_root_and_slug_meta(self):
-        page = build.build_entry_pages(REAL)["krea2-drift"]
+        page = build.build_pages(REAL)[1]["krea2-drift"]
         self.assertIn('name="entry-slug" content="krea2-drift"', page)
         self.assertIn('name="site-root" content="../../"', page)
         self.assertIn('src="../../assets/js/app.js', page)
         self.assertIn('href="../../docs/HERETIC_PLUGINS.md"', page)
         self.assertNotIn('href="docs/HERETIC_PLUGINS.md"', page)
+
+
+class GeoArtifactTests(unittest.TestCase):
+    def test_pages_ship_readable_static_content_and_schema(self):
+        home, pages = build.build_pages(REAL)
+        self.assertIn('<h1 class="catalog-title">', home)
+        self.assertIn('application/ld+json', home)
+        self.assertIn('og-image.png', home)
+        self.assertNotIn('{{', home)
+        page = pages["krea2-drift"]
+        self.assertIn('<h1 class="article-title">Krea2Drift', page)
+        self.assertIn('Setup prompt', page)
+        self.assertIn('application/ld+json', page)
+        self.assertNotIn('{{', page)
+
+    def test_discovery_files_have_crawler_directives_and_entries(self):
+        files = build.build_discovery_files(REAL)
+        self.assertIn('User-agent: GPTBot', files["robots.txt"])
+        self.assertIn('/entries/krea2-drift/', files["sitemap.xml"])
+        self.assertIn('Krea2Drift', files["llms.txt"])
+        self.assertIn('Setup prompt', files["llms-full.txt"])
+
+    def test_generated_discovery_files_match(self):
+        for name, text in build.build_discovery_files(REAL).items():
+            self.assertEqual((ROOT / name).read_text(encoding="utf-8"), text, name)
 
 
 if __name__ == "__main__":

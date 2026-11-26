@@ -1,0 +1,26 @@
+# hplugins
+
+> A curated registry of community-built Heretic plugins, scorers, configs, models, and tools.
+> Every entry has a source, a usage guide, and a setup prompt for a coding model.
+
+## Start here
+
+- [Catalog](https://hplugins.sdad.pro/) - every community entry
+- [Contribute an entry](https://hplugins.sdad.pro/docs/contributing.md) - required format and PR steps
+- [Full catalog text](https://hplugins.sdad.pro/llms-full.txt) - all entries with descriptions and sources
+
+## Entries
+
+- [Krea2Drift](https://hplugins.sdad.pro/entries/krea2-drift/): Measures how far an ablation shifts the text conditioning that Krea 2 feeds to its image model, without generating an image.
+- [Krea2Good](https://hplugins.sdad.pro/entries/krea2-good/): Minimizes the p90 drift of good image prompts so an ablation leaves benign Krea 2 conditioning stable.
+- [Krea2Bad](https://hplugins.sdad.pro/entries/krea2-bad/): Maximizes the p90 drift of bad image prompts so abliteration visibly changes how the model handles them.
+- [GibberishRate](https://hplugins.sdad.pro/entries/gibberish-rate/): Flags trials whose responses turn into gibberish by counting distinct Unicode scripts.
+- [Calibrated PIQA](https://hplugins.sdad.pro/entries/calibrated-piqa/): A Heretic fork with a benchmark scorer tuned to PIQA questions that flip between right and wrong.
+- [LLM Judge scorer](https://hplugins.sdad.pro/entries/llm-judge/): Uses a separate language model to decide whether a response actually complies, instead of matching refusal keywords.
+- [Refusal-direction scorer/tagger](https://hplugins.sdad.pro/entries/refusal-direction-tagger/): Detects refusals by comparing initial refusal directions with response hidden states instead of keyword lists.
+- [Chinese censorship config fork](https://hplugins.sdad.pro/entries/china-censorship-config/): A Heretic fork with refusal markers and prompts aimed at region-specific Chinese censorship rather than general refusals.
+- [vantablack refusal classifier](https://hplugins.sdad.pro/entries/vantablack/): A refusal classification model for the BERTClassifier scorer, with separate full and partial refusal labels.
+- [Refusal Classifier V3](https://hplugins.sdad.pro/entries/refusal-classifier-v3/): A family of refusal classifiers for BERTClassifier, published in small and large variants.
+- [MPOA abliteration](https://hplugins.sdad.pro/entries/mpoa/): Magnitude-preserving orthogonal ablation, available through Heretic's directional abliteration modifier.
+- [SOMA modifier](https://hplugins.sdad.pro/entries/soma-modifier/): A planned multi-directional modifier intended to sit alongside ARA as a shipped plugin.
+- [Emotion steering config](https://hplugins.sdad.pro/entries/emotions-config/): An official non-default config that steers emotions by minimizing negative and maximizing positive labels.

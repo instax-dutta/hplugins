@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Browser-facing presentation assets: CSS, JavaScript, fonts, and the favicon. The HTML shell lives at the repo root and the data lives in `data/`; this folder consumes both. No runtime dependencies beyond what GitHub Pages serves.
+Browser-facing presentation assets: CSS, JavaScript, fonts, favicon, and the Open Graph image. The HTML pages are generated from `tools/shell.html` and the data lives in `data/`; this folder consumes both. No runtime dependencies beyond what GitHub Pages serves.
 
 ## Ownership
 
@@ -17,7 +17,8 @@ Static presentation and client-side behavior. `data/catalog.json` content is own
 - JS expects `data/search-index.json`; on fetch failure it shows an inline error with a retry, never a blank page.
 - Self-hosted fonts in `assets/fonts/` with `font-display: swap`. Never link a font CDN.
 - Bump the `?v=` query on the CSS and JS links in the root `index.html` when either file changes so Cloudflare serves the new asset.
-- Generated entry pages under `entries/` reference these assets with `../../assets/`; never write absolute URLs into the shell.
+- Generated pages reference these assets with `{{ROOT}}assets/` in the template; never write absolute URLs into it.
+- Every generated page ships readable static content, canonical URL, Open Graph/Twitter metadata, and JSON-LD. JS enhances that content; it must not be the only source of text.
 
 ## Work Guidance
 

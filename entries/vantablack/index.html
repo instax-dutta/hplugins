@@ -3,16 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>hplugins - Community-built Heretic plugins and scorers</title>
-  <meta name="description" content="A curated index of community-built Heretic scorers, modifiers, configs, and models. Each entry includes source links, a usage guide, and a copy-paste setup prompt.">
-  <meta name="site-root" content="../../">
+  <title>vantablack refusal classifier - hplugins</title>
+  <meta name="description" content="A refusal classification model for the BERTClassifier scorer, with separate full and partial refusal labels.">
+    <link rel="canonical" href="https://hplugins.sdad.pro/entries/vantablack/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="hplugins">
+  <meta property="og:title" content="vantablack refusal classifier - hplugins">
+  <meta property="og:description" content="A refusal classification model for the BERTClassifier scorer, with separate full and partial refusal labels.">
+  <meta property="og:url" content="https://hplugins.sdad.pro/entries/vantablack/">
+  <meta property="og:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="vantablack refusal classifier - hplugins">
+  <meta name="twitter:description" content="A refusal classification model for the BERTClassifier scorer, with separate full and partial refusal labels.">
+  <meta name="twitter:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "vantablack refusal classifier", "description": "A refusal classification model for the BERTClassifier scorer, with separate full and partial refusal labels.", "author": {"@type": "Person", "name": "saidutta69"}, "keywords": "model, classifier, bert, refusals, bertclassifier", "inLanguage": "en", "mainEntityOfPage": "https://hplugins.sdad.pro/entries/vantablack/", "isPartOf": {"@type": "WebSite", "name": "hplugins", "url": "https://hplugins.sdad.pro/"}, "citation": ["https://huggingface.co/saidutta69/vantablack", "https://heretic-project.org/configuration#scorer-bertclassifier"]}</script>
+    <meta name="site-root" content="../../">
   <meta name="entry-slug" content="vantablack">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#EDEFF1">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../../assets/fonts/archivo-400-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../../assets/css/site.css?v=5">
+  <link rel="stylesheet" href="../../assets/css/site.css?v=6">
   <script>
     // Applied before paint so the plate never flashes the wrong theme.
     (function () {
@@ -23,7 +35,7 @@
       } catch (e) {}
     })();
   </script>
-  <script src="../../assets/js/app.js?v=5" defer></script>
+  <script src="../../assets/js/app.js?v=6" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -55,7 +67,16 @@
     </aside>
 
     <main class="main" id="main">
-      <div id="view" aria-live="polite"></div>
+      <div id="view" aria-live="polite"><div class="article"><a class="crumb" href="../../">&larr; back to index</a><h1 class="article-title">vantablack refusal classifier</h1><p class="article-meta">/model - by saidutta69 - available</p><p class="article-lead">A refusal classification model for the BERTClassifier scorer, with separate full and partial refusal labels.</p><section class="article-section"><h2 class="section-title">What it does</h2><p class="prose">A text-classification model published for Heretic&#x27;s BERTClassifier scorer. It uses two refusal labels and text pairs, so it can distinguish a full refusal from a partial one. Community reports found it more conservative than keyword matching on image-generation prompts, which may suit different workflows.</p></section><section class="article-section"><h2 class="section-title">Where to find it</h2><ul class="link-list"><li><a href="https://huggingface.co/saidutta69/vantablack">Model on Hugging Face</a></li><li><a href="https://heretic-project.org/configuration#scorer-bertclassifier">BERTClassifier docs</a></li></ul></section><section class="article-section"><h2 class="section-title">How to use it</h2><ol class="steps"><li>Enable BERTClassifier by adding it to the scorers list; it is not enabled by default.</li><li>Set model to saidutta69/vantablack and match_labels to the two refusal labels.</li><li>Enable use_text_pairs so prompts and responses are classified together.</li><li>Compare its refusal count with KeywordRate before a long run.</li></ol></section><section class="article-section"><h2 class="section-title">Config fragment</h2><pre class="code-block">scorers = [
+    { plugin = &quot;heretic.scorers.bert_classifier.BERTClassifier&quot;, optimization = &quot;minimize&quot; },
+    { plugin = &quot;heretic.scorers.kl_divergence.KLDivergence&quot;, optimization = &quot;minimize&quot; },
+]
+
+[scorer.BERTClassifier]
+model = &quot;saidutta69/vantablack&quot;
+match_labels = [&quot;full_refusal&quot;, &quot;partial_refusal&quot;]
+use_text_pairs = true
+max_length = 512</pre></section><section class="article-section"><h2 class="section-title">Setup prompt</h2><pre class="code-block">Configure the saidutta69/vantablack refusal classifier with Heretic&#x27;s BERTClassifier scorer in my local config.toml. Add { plugin = &quot;heretic.scorers.bert_classifier.BERTClassifier&quot;, optimization = &quot;minimize&quot; } to the scorers list, keep KLDivergence minimizing, and add a [scorer.BERTClassifier] section with model = &quot;saidutta69/vantablack&quot;, match_labels = [&quot;full_refusal&quot;, &quot;partial_refusal&quot;], use_text_pairs = true, and max_length = 512. BERTClassifier is not enabled by default, so make sure the entry is present rather than only the settings section. Verify by starting Heretic and checking the log line that reports which classifier model was loaded, then compare the first trial&#x27;s refusal count with KeywordRate.</pre></section></div></div>
     </main>
   </div>
 

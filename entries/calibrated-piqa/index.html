@@ -3,16 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>hplugins - Community-built Heretic plugins and scorers</title>
-  <meta name="description" content="A curated index of community-built Heretic scorers, modifiers, configs, and models. Each entry includes source links, a usage guide, and a copy-paste setup prompt.">
-  <meta name="site-root" content="../../">
+  <title>Calibrated PIQA - hplugins</title>
+  <meta name="description" content="A Heretic fork with a benchmark scorer tuned to PIQA questions that flip between right and wrong.">
+    <link rel="canonical" href="https://hplugins.sdad.pro/entries/calibrated-piqa/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="hplugins">
+  <meta property="og:title" content="Calibrated PIQA - hplugins">
+  <meta property="og:description" content="A Heretic fork with a benchmark scorer tuned to PIQA questions that flip between right and wrong.">
+  <meta property="og:url" content="https://hplugins.sdad.pro/entries/calibrated-piqa/">
+  <meta property="og:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Calibrated PIQA - hplugins">
+  <meta name="twitter:description" content="A Heretic fork with a benchmark scorer tuned to PIQA questions that flip between right and wrong.">
+  <meta name="twitter:image" content="https://hplugins.sdad.pro/assets/og-image.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Calibrated PIQA", "description": "A Heretic fork with a benchmark scorer tuned to PIQA questions that flip between right and wrong.", "author": {"@type": "Person", "name": "electroglyph"}, "keywords": "scorer, benchmark, piqa, gpqa, fork", "inLanguage": "en", "mainEntityOfPage": "https://hplugins.sdad.pro/entries/calibrated-piqa/", "isPartOf": {"@type": "WebSite", "name": "hplugins", "url": "https://hplugins.sdad.pro/"}, "citation": ["https://github.com/electroglyph/heretic", "https://huggingface.co/electroglyph/Spark-X2.6-4B-benchmarks-gpqa"]}</script>
+    <meta name="site-root" content="../../">
   <meta name="entry-slug" content="calibrated-piqa">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#EDEFF1">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../../assets/fonts/archivo-400-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../../assets/css/site.css?v=5">
+  <link rel="stylesheet" href="../../assets/css/site.css?v=6">
   <script>
     // Applied before paint so the plate never flashes the wrong theme.
     (function () {
@@ -23,7 +35,7 @@
       } catch (e) {}
     })();
   </script>
-  <script src="../../assets/js/app.js?v=5" defer></script>
+  <script src="../../assets/js/app.js?v=6" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -55,7 +67,14 @@
     </aside>
 
     <main class="main" id="main">
-      <div id="view" aria-live="polite"></div>
+      <div id="view" aria-live="polite"><div class="article"><a class="crumb" href="../../">&larr; back to index</a><h1 class="article-title">Calibrated PIQA</h1><p class="article-meta">/scorer - by electroglyph - community</p><p class="article-lead">A Heretic fork with a benchmark scorer tuned to PIQA questions that flip between right and wrong.</p><section class="article-section"><h2 class="section-title">What it does</h2><p class="prose">Built on the mainline BenchmarkScore idea, this fork repeatedly evaluates a model, keeps questions whose answers flip-flop, and batches those questions to get a higher-signal quality metric. It was used while comparing ablated models against GPQA results. The author reports a modest improvement in signal over plain PIQA, not a perfect correlation.</p></section><section class="article-section"><h2 class="section-title">Where to find it</h2><ul class="link-list"><li><a href="https://github.com/electroglyph/heretic">Fork with the scorer</a></li><li><a href="https://huggingface.co/electroglyph/Spark-X2.6-4B-benchmarks-gpqa">Benchmark results model</a></li></ul></section><section class="article-section"><h2 class="section-title">How to use it</h2><ol class="steps"><li>Clone the fork instead of mainline Heretic if you want the author&#x27;s exact scorer.</li><li>Configure a BenchmarkScore-style entry with optimization = maximize and select the calibrated task the fork defines.</li><li>Compare its score against KL divergence on the same trials before trusting it.</li><li>Use a short benchmark so it stays fast enough for trial-level scoring.</li></ol></section><section class="article-section"><h2 class="section-title">Config fragment</h2><pre class="code-block">scorers = [
+    { plugin = &quot;heretic.scorers.keyword_rate.KeywordRate&quot;, optimization = &quot;minimize&quot; },
+    { plugin = &quot;heretic.scorers.benchmark_score.BenchmarkScore&quot;, optimization = &quot;maximize&quot; },
+]
+
+[scorer.BenchmarkScore]
+task = &quot;piqa&quot;
+metric = &quot;acc_norm,none&quot;</pre></section><section class="article-section"><h2 class="section-title">Setup prompt</h2><pre class="code-block">Set up electroglyph&#x27;s calibrated PIQA approach in my local Heretic checkout. First inspect https://github.com/electroglyph/heretic and identify the benchmark scorer it adds for repeatedly sampling PIQA and keeping flip-flopping questions. If I already have that fork checked out, register its scorer in the scorers list with optimization = maximize and keep KeywordRate minimizing. If I have mainline Heretic, explain that the closest built-in option is heretic.scorers.benchmark_score.BenchmarkScore with task = &quot;piqa&quot; and metric = &quot;acc_norm,none&quot;, and offer to configure that instead. Do not claim the calibrated variant is present when it is not. Verify by running one trial and confirming a benchmark score is printed.</pre></section></div></div>
     </main>
   </div>
 

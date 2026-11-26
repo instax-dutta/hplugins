@@ -54,13 +54,17 @@ def merge_decision(
     if pr.get("mergeable_state") in BAD_MERGE_STATES:
         return "SKIP: PR merge state is " + str(pr.get("mergeable_state"))
 
-    if isinstance(reviews, list) and any(
+    if not isinstance(reviews, list):
+        return "SKIP: PR review list is unavailable"
+    if any(
         isinstance(review, dict) and review.get("state") == "CHANGES_REQUESTED"
         for review in reviews
     ):
         return "SKIP: PR has a requested change"
 
-    nodes = threads.get("data", {}).get("repository", {}).get("pullRequest", {}).get("reviewThreads", {})
+    nodes = threads.get("data", {}).get("repository", {}).get("pullRequest", {}).get("reviewThreads")
+    if not isinstance(nodes, dict):
+        return "SKIP: review thread data is unavailable"
     if nodes.get("pageInfo", {}).get("hasNextPage"):
         return "SKIP: review threads were not fully checked"
     if any(thread.get("isResolved") is False for thread in nodes.get("nodes", [])):

@@ -93,6 +93,10 @@ class GuardTests(unittest.TestCase):
         threads["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"] = [{"isResolved": False}]
         self.assertTrue(decide(threads=threads).startswith("SKIP"))
 
+    def test_malformed_review_payloads_block_merge(self):
+        self.assertTrue(decide(reviews={}).startswith("SKIP"))
+        self.assertTrue(decide(threads={}).startswith("SKIP"))
+
     def test_unpaginated_threads_block_merge(self):
         threads = copy.deepcopy(fixtures()["threads"])
         threads["data"]["repository"]["pullRequest"]["reviewThreads"]["pageInfo"]["hasNextPage"] = True

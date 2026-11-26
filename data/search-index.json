@@ -68,7 +68,7 @@
     "name": "Calibrated PIQA",
     "type": "scorer",
     "author": "electroglyph",
-    "summary": "A fork of Heretic with a benchmark scorer tuned to PIQA questions that flip between right and wrong.",
+    "summary": "A Heretic fork with a benchmark scorer tuned to PIQA questions that flip between right and wrong.",
     "status": "community",
     "tags": [
       "scorer",
@@ -77,7 +77,7 @@
       "gpqa",
       "fork"
     ],
-    "search": "calibrated piqa electroglyph a fork of heretic with a benchmark scorer tuned to piqa questions that flip between right and wrong. built on the mainline benchmarkscore idea, this fork repeatedly evaluates a model, keeps questions whose answers flip-flop, and batches those questions to get a higher-signal quality metric. it was used while comparing ablated models against gpqa results. the author reports a modest improvement in signal over plain piqa, not a perfect correlation. scorer community scorer benchmark piqa gpqa fork"
+    "search": "calibrated piqa electroglyph a heretic fork with a benchmark scorer tuned to piqa questions that flip between right and wrong. built on the mainline benchmarkscore idea, this fork repeatedly evaluates a model, keeps questions whose answers flip-flop, and batches those questions to get a higher-signal quality metric. it was used while comparing ablated models against gpqa results. the author reports a modest improvement in signal over plain piqa, not a perfect correlation. scorer community scorer benchmark piqa gpqa fork"
   },
   {
     "slug": "llm-judge",

@@ -7,10 +7,22 @@
     "summary": "Measures how far an ablation shifts the text conditioning that Krea 2 feeds to its image model, without generating an image.",
     "description": "Reads the fused text tensor from twelve tapped Qwen3-VL layers and reports the mean token cosine drift against the unmodified model, in percent. It is a diagnostic: the shared config uses optimization = none so the score is visible without steering the optimizer. Very sensitive to prompt choice, and it needs a Krea 2 Turbo safetensors checkpoint and roughly 16 GB of VRAM.",
     "status": "community",
-    "tags": ["scorer", "krea2", "qwen3-vl", "image", "diagnostic"],
+    "tags": [
+      "scorer",
+      "krea2",
+      "qwen3-vl",
+      "image",
+      "diagnostic"
+    ],
     "where_to_find": [
-      { "label": "Discord post with config", "url": "https://discord.com/channels/1447831134212984903/1447845008534405270" },
-      { "label": "Extracted inventory", "url": "HERETIC_PLUGINS.md" }
+      {
+        "label": "Discord post with config",
+        "url": "https://discord.com/channels/1447831134212984903/1447845008534405270"
+      },
+      {
+        "label": "Extracted inventory",
+        "url": "HERETIC_PLUGINS.md"
+      }
     ],
     "how_to_use": [
       "Place krea2_drift.py in the working directory you run Heretic from.",
@@ -29,10 +41,22 @@
     "summary": "Minimizes the p90 drift of good image prompts so an ablation leaves benign Krea 2 conditioning stable.",
     "description": "The first half of a paired scorer for image-generating VLMs. It takes the largest conditioning drift left after discarding the ten percent of prompts that moved most, then asks the optimizer to minimize it. Lower values mean the good prompts kept their original trajectory. Use it together with Krea2Bad and a KL divergence scorer.",
     "status": "community",
-    "tags": ["scorer", "krea2", "qwen3-vl", "image", "minimize"],
+    "tags": [
+      "scorer",
+      "krea2",
+      "qwen3-vl",
+      "image",
+      "minimize"
+    ],
     "where_to_find": [
-      { "label": "Discord post with config", "url": "https://discord.com/channels/1447831134212984903/1447845008534405270" },
-      { "label": "Local plugin source", "url": "krea2_drift_v2.py" }
+      {
+        "label": "Discord post with config",
+        "url": "https://discord.com/channels/1447831134212984903/1447845008534405270"
+      },
+      {
+        "label": "Local plugin source",
+        "url": "krea2_drift_v2.py"
+      }
     ],
     "how_to_use": [
       "Put krea2_drift_v2.py in the directory you run Heretic from.",
@@ -51,10 +75,22 @@
     "summary": "Maximizes the p90 drift of bad image prompts so abliteration visibly changes how the model handles them.",
     "description": "The second half of the paired Krea 2 scorer. It keeps the smallest conditioning drift after discarding the ten percent of prompts that moved least, then maximizes it. The author's sign of success is Krea2Bad p90min rising above Krea2Good p90max. It correlates with refusal rate on image prompts, so it is useful only alongside a quality scorer such as KL divergence.",
     "status": "community",
-    "tags": ["scorer", "krea2", "qwen3-vl", "image", "maximize"],
+    "tags": [
+      "scorer",
+      "krea2",
+      "qwen3-vl",
+      "image",
+      "maximize"
+    ],
     "where_to_find": [
-      { "label": "Discord post with config", "url": "https://discord.com/channels/1447831134212984903/1447845008534405270" },
-      { "label": "Local plugin source", "url": "krea2_drift_v2.py" }
+      {
+        "label": "Discord post with config",
+        "url": "https://discord.com/channels/1447831134212984903/1447845008534405270"
+      },
+      {
+        "label": "Local plugin source",
+        "url": "krea2_drift_v2.py"
+      }
     ],
     "how_to_use": [
       "Install krea2_drift_v2.py beside config.toml and pair this scorer with Krea2Good.",
@@ -73,10 +109,22 @@
     "summary": "Flags trials whose responses turn into gibberish by counting distinct Unicode scripts.",
     "description": "A community scorer written with coding-model assistance after ARA runs produced incoherent outputs. It probes a few prompts per trial and classifies a response as gibberish when it contains more than a configured number of distinct scripts. By default it skips or aborts affected trials rather than adding another optimization objective. No source repository was published; only the config snippet is available.",
     "status": "proof-of-concept",
-    "tags": ["scorer", "gibberish", "unicode", "ara", "guardrail"],
+    "tags": [
+      "scorer",
+      "gibberish",
+      "unicode",
+      "ara",
+      "guardrail"
+    ],
     "where_to_find": [
-      { "label": "Discord config snippet", "url": "https://discord.com/channels/1447831134212984903/1447845008534405270" },
-      { "label": "Heretic plugin interface", "url": "https://github.com/p-e-w/heretic/blob/master/src/heretic/scorer.py" }
+      {
+        "label": "Discord config snippet",
+        "url": "https://discord.com/channels/1447831134212984903/1447845008534405270"
+      },
+      {
+        "label": "Heretic plugin interface",
+        "url": "https://github.com/p-e-w/heretic/blob/master/src/heretic/scorer.py"
+      }
     ],
     "how_to_use": [
       "Find or write a GibberishRate plugin class that reads n_prompts, max_scripts, and min_characters_per_script from its config section.",
@@ -92,13 +140,25 @@
     "name": "Calibrated PIQA",
     "type": "scorer",
     "author": "electroglyph",
-    "summary": "A fork of Heretic with a benchmark scorer tuned to PIQA questions that flip between right and wrong.",
+    "summary": "A Heretic fork with a benchmark scorer tuned to PIQA questions that flip between right and wrong.",
     "description": "Built on the mainline BenchmarkScore idea, this fork repeatedly evaluates a model, keeps questions whose answers flip-flop, and batches those questions to get a higher-signal quality metric. It was used while comparing ablated models against GPQA results. The author reports a modest improvement in signal over plain PIQA, not a perfect correlation.",
     "status": "community",
-    "tags": ["scorer", "benchmark", "piqa", "gpqa", "fork"],
+    "tags": [
+      "scorer",
+      "benchmark",
+      "piqa",
+      "gpqa",
+      "fork"
+    ],
     "where_to_find": [
-      { "label": "Fork with the scorer", "url": "https://github.com/electroglyph/heretic" },
-      { "label": "Benchmark results model", "url": "https://huggingface.co/electroglyph/Spark-X2.6-4B-benchmarks-gpqa" }
+      {
+        "label": "Fork with the scorer",
+        "url": "https://github.com/electroglyph/heretic"
+      },
+      {
+        "label": "Benchmark results model",
+        "url": "https://huggingface.co/electroglyph/Spark-X2.6-4B-benchmarks-gpqa"
+      }
     ],
     "how_to_use": [
       "Clone the fork instead of mainline Heretic if you want the author's exact scorer.",
@@ -117,10 +177,22 @@
     "summary": "Uses a separate language model to decide whether a response actually complies, instead of matching refusal keywords.",
     "description": "A pull request that sends responses to a judge model through an OpenAI-compatible API and classifies them. It was motivated by thinking models that refuse inside the reasoning trace and by unusual refusal formats that keyword lists miss. The author found that running the judge as an external API client worked better than loading it inside the Heretic process.",
     "status": "proof-of-concept",
-    "tags": ["scorer", "llm-judge", "refusals", "api", "pr"],
+    "tags": [
+      "scorer",
+      "llm-judge",
+      "refusals",
+      "api",
+      "pr"
+    ],
     "where_to_find": [
-      { "label": "Plugin system PR discussion", "url": "https://github.com/p-e-w/heretic/pull/53" },
-      { "label": "Mainline scorer interface", "url": "https://github.com/p-e-w/heretic/blob/master/src/heretic/scorer.py" }
+      {
+        "label": "Plugin system PR discussion",
+        "url": "https://github.com/p-e-w/heretic/pull/53"
+      },
+      {
+        "label": "Mainline scorer interface",
+        "url": "https://github.com/p-e-w/heretic/blob/master/src/heretic/scorer.py"
+      }
     ],
     "how_to_use": [
       "Check whether the LLM judge PR has been adapted to your Heretic version; the plugin interface changed between 1.x and 2.x.",
@@ -139,10 +211,22 @@
     "summary": "Detects refusals by comparing initial refusal directions with response hidden states instead of keyword lists.",
     "description": "An early plugin-branch experiment from the Heretic contributor working on the plugin system. It compares the model's refusal direction with hidden states at the generated response, inspired by activation-steering research. It was tested on a small Gemma 3 model and remained a development branch rather than a published plugin.",
     "status": "proof-of-concept",
-    "tags": ["scorer", "tagger", "refusal-direction", "activations", "research"],
+    "tags": [
+      "scorer",
+      "tagger",
+      "refusal-direction",
+      "activations",
+      "research"
+    ],
     "where_to_find": [
-      { "label": "Plugin system PR", "url": "https://github.com/p-e-w/heretic/pull/53" },
-      { "label": "Referenced steering paper", "url": "https://arxiv.org/abs/2506.00085" }
+      {
+        "label": "Plugin system PR",
+        "url": "https://github.com/p-e-w/heretic/pull/53"
+      },
+      {
+        "label": "Referenced steering paper",
+        "url": "https://arxiv.org/abs/2506.00085"
+      }
     ],
     "how_to_use": [
       "Read the plugin PR discussion before attempting this; the scorer/tagger API changed during development.",
@@ -161,10 +245,22 @@
     "summary": "A Heretic fork with refusal markers and prompts aimed at region-specific Chinese censorship rather than general refusals.",
     "description": "Shared in the community server as a working configuration fork. It changes the refusal markers and dataset setup so the optimization targets censorship behavior specific to Chinese-language prompts. Treat it as a starting config to adapt, not a drop-in plugin.",
     "status": "community",
-    "tags": ["config", "chinese", "censorship", "keywords", "fork"],
+    "tags": [
+      "config",
+      "chinese",
+      "censorship",
+      "keywords",
+      "fork"
+    ],
     "where_to_find": [
-      { "label": "Fork on GitHub", "url": "https://github.com/benjamin920101/heretic-china-censorship" },
-      { "label": "Config file", "url": "https://github.com/benjamin920101/heretic-china-censorship/blob/master/config.default.toml" }
+      {
+        "label": "Fork on GitHub",
+        "url": "https://github.com/benjamin920101/heretic-china-censorship"
+      },
+      {
+        "label": "Config file",
+        "url": "https://github.com/benjamin920101/heretic-china-censorship/blob/master/config.default.toml"
+      }
     ],
     "how_to_use": [
       "Copy the fork's config.default.toml into your Heretic working directory as config.toml.",
@@ -183,10 +279,22 @@
     "summary": "A refusal classification model for the BERTClassifier scorer, with separate full and partial refusal labels.",
     "description": "A text-classification model published for Heretic's BERTClassifier scorer. It uses two refusal labels and text pairs, so it can distinguish a full refusal from a partial one. Community reports found it more conservative than keyword matching on image-generation prompts, which may suit different workflows.",
     "status": "available",
-    "tags": ["model", "classifier", "bert", "refusals", "bertclassifier"],
+    "tags": [
+      "model",
+      "classifier",
+      "bert",
+      "refusals",
+      "bertclassifier"
+    ],
     "where_to_find": [
-      { "label": "Model on Hugging Face", "url": "https://huggingface.co/saidutta69/vantablack" },
-      { "label": "BERTClassifier docs", "url": "https://heretic-project.org/configuration#scorer-bertclassifier" }
+      {
+        "label": "Model on Hugging Face",
+        "url": "https://huggingface.co/saidutta69/vantablack"
+      },
+      {
+        "label": "BERTClassifier docs",
+        "url": "https://heretic-project.org/configuration#scorer-bertclassifier"
+      }
     ],
     "how_to_use": [
       "Enable BERTClassifier by adding it to the scorers list; it is not enabled by default.",
@@ -205,11 +313,26 @@
     "summary": "A family of refusal classifiers for BERTClassifier, published in small and large variants.",
     "description": "Successor models to the V1 and V2 refusal classifiers commonly used with Heretic's BERTClassifier scorer. The author reports a new non-compliant label and stress-test results for both sizes. The large variant is the more accurate of the two according to the author's published tests; treat those numbers as author-reported, not independent benchmarks.",
     "status": "available",
-    "tags": ["model", "classifier", "bert", "refusals", "v3"],
+    "tags": [
+      "model",
+      "classifier",
+      "bert",
+      "refusals",
+      "v3"
+    ],
     "where_to_find": [
-      { "label": "V3 Small", "url": "https://huggingface.co/VINAY-UMRETHE/Refusal-Classifier-V3-Small" },
-      { "label": "V3 Large", "url": "https://huggingface.co/VINAY-UMRETHE/Refusal-Classifier-V3-Large" },
-      { "label": "V2 model", "url": "https://huggingface.co/VINAY-UMRETHE/Refusal-Classifier-V2" }
+      {
+        "label": "V3 Small",
+        "url": "https://huggingface.co/VINAY-UMRETHE/Refusal-Classifier-V3-Small"
+      },
+      {
+        "label": "V3 Large",
+        "url": "https://huggingface.co/VINAY-UMRETHE/Refusal-Classifier-V3-Large"
+      },
+      {
+        "label": "V2 model",
+        "url": "https://huggingface.co/VINAY-UMRETHE/Refusal-Classifier-V2"
+      }
     ],
     "how_to_use": [
       "Enable BERTClassifier in the scorers list with optimization = minimize.",
@@ -228,10 +351,22 @@
     "summary": "Magnitude-preserving orthogonal ablation, available through Heretic's directional abliteration modifier.",
     "description": "A modifier technique that preserves norm and uses orthogonal directions during abliteration. It began as a community pull request and is now supported by the shipped Abliteration modifier through settings such as row normalization and orthogonalize-direction. Community reports suggest it helps many models, but the maintainer notes that Heretic's parameter search plus MPOA beats the original MPOA parameter strategy.",
     "status": "available",
-    "tags": ["modifier", "abliteration", "mpoa", "orthogonal", "norm"],
+    "tags": [
+      "modifier",
+      "abliteration",
+      "mpoa",
+      "orthogonal",
+      "norm"
+    ],
     "where_to_find": [
-      { "label": "Original PR discussion", "url": "https://github.com/p-e-w/heretic/pull/52" },
-      { "label": "Abliteration source", "url": "https://github.com/p-e-w/heretic/blob/master/src/heretic/modifiers/abliteration.py" }
+      {
+        "label": "Original PR discussion",
+        "url": "https://github.com/p-e-w/heretic/pull/52"
+      },
+      {
+        "label": "Abliteration source",
+        "url": "https://github.com/p-e-w/heretic/blob/master/src/heretic/modifiers/abliteration.py"
+      }
     ],
     "how_to_use": [
       "Switch the modifiers list to heretic.modifiers.abliteration.Abliteration.",
@@ -250,10 +385,22 @@
     "summary": "A planned multi-directional modifier intended to sit alongside ARA as a shipped plugin.",
     "description": "The maintainer described SOMA as a multi-directional transport technique that uses a fixed number of linear paths. It is not released in the current master branch; the plugin interface was reworked specifically so techniques like SOMA can be added. List it here to track intent, not to install today.",
     "status": "planned",
-    "tags": ["modifier", "soma", "ara", "planned", "transport"],
+    "tags": [
+      "modifier",
+      "soma",
+      "ara",
+      "planned",
+      "transport"
+    ],
     "where_to_find": [
-      { "label": "Plugin system PR", "url": "https://github.com/p-e-w/heretic/pull/53" },
-      { "label": "Modifier interface", "url": "https://github.com/p-e-w/heretic/blob/master/src/heretic/modifier.py" }
+      {
+        "label": "Plugin system PR",
+        "url": "https://github.com/p-e-w/heretic/pull/53"
+      },
+      {
+        "label": "Modifier interface",
+        "url": "https://github.com/p-e-w/heretic/blob/master/src/heretic/modifier.py"
+      }
     ],
     "how_to_use": [
       "Check the current Heretic release notes before attempting anything; this is not shipped yet.",
@@ -272,10 +419,22 @@
     "summary": "An official non-default config that steers emotions by minimizing negative and maximizing positive labels.",
     "description": "Uses two instances of BERTClassifier with a DistilRoBERTa emotion model, plus KL divergence. One instance minimizes negative emotions and another maximizes positive ones, giving a concrete example of how multiple instances of the same scorer can co-optimize opposite directions. It ships in the repository but is not the default.",
     "status": "available",
-    "tags": ["config", "emotions", "bertclassifier", "steering", "official"],
+    "tags": [
+      "config",
+      "emotions",
+      "bertclassifier",
+      "steering",
+      "official"
+    ],
     "where_to_find": [
-      { "label": "Config file", "url": "https://github.com/p-e-w/heretic/blob/master/config.emotions.toml" },
-      { "label": "Default config reference", "url": "https://github.com/p-e-w/heretic/blob/master/config.default.toml" }
+      {
+        "label": "Config file",
+        "url": "https://github.com/p-e-w/heretic/blob/master/config.emotions.toml"
+      },
+      {
+        "label": "Default config reference",
+        "url": "https://github.com/p-e-w/heretic/blob/master/config.default.toml"
+      }
     ],
     "how_to_use": [
       "Copy config.emotions.toml to config.toml in your Heretic working directory.",

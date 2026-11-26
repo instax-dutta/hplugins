@@ -119,10 +119,18 @@
         '<span class="entry-meta"><span>/' + esc(item.type) + '</span>' + stamp(item.status) + "</span></a></li>";
     }).join("");
 
-    if (!items.some(function (item) { return item.slug === state.previewSlug; })) {
-      state.previewSlug = items[0].slug;
+    if (state.previewSlug && !items.some(function (item) { return item.slug === state.previewSlug; })) {
+      state.previewSlug = null;
     }
-    previewDossier(state.previewSlug);
+    if (state.previewSlug) previewDossier(state.previewSlug);
+    else renderEmptyDossier();
+  }
+
+  function renderEmptyDossier() {
+    dossierView.innerHTML =
+      '<p class="dossier-kicker">Dossier</p>' +
+      '<h2 class="dossier-name">Nothing selected yet.</h2>' +
+      '<p class="dossier-summary">Hover a row to preview it here. Open a part to read its guide and copy its setup prompt.</p>';
   }
 
   function previewDossier(slug) {
@@ -196,6 +204,7 @@
       if (row) previewDossier(row.dataset.slug);
     });
 
+    state.previewSlug = null;
     updateList();
   }
 

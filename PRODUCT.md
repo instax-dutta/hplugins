@@ -39,7 +39,7 @@ Name: `hplugins`. No existing logo, palette, or font contract was supplied. Voic
 
 ## Evidence on Hand
 
-`HERETIC_PLUGINS.md` at the repo root contains the extracted inventory from `p-e-w/heretic` master, a 19,685-message Discord export (2025-12-09 to 2026-11-26), and two local Krea 2 scorer files. No visual assets, screenshots, or brand files were provided. Do not fabricate screenshots, testimonials, benchmarks, or licenses.
+`docs/HERETIC_PLUGINS.md` contains the extracted inventory from `p-e-w/heretic` master, a 19,685-message Discord export (2025-12-09 to 2026-11-26), and two local Krea 2 scorer files. No visual assets, screenshots, or brand files were provided. Do not fabricate screenshots, testimonials, benchmarks, or licenses.
 
 ## Product Principles
 

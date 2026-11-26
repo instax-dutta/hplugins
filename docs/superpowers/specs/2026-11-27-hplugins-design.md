@@ -12,7 +12,7 @@ A lightweight public listing of community-made and non-default Heretic plugins, 
 - Runtime dependency budget is zero: no framework, no npm, no CDN.
 - Build dependency budget is Python 3 standard library.
 - Dark and light themes, keyboard access, visible focus, reduced motion.
-- Source inventory is `HERETIC_PLUGINS.md`; no link, author, or benchmark may be invented.
+- Source inventory is `docs/HERETIC_PLUGINS.md`; no link, author, or benchmark may be invented.
 
 ## Architecture
 

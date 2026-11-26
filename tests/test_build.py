@@ -100,6 +100,8 @@ class EntryPageTests(unittest.TestCase):
         self.assertIn('name="entry-slug" content="krea2-drift"', page)
         self.assertIn('name="site-root" content="../../"', page)
         self.assertIn('src="../../assets/js/app.js', page)
+        self.assertIn('href="../../docs/HERETIC_PLUGINS.md"', page)
+        self.assertNotIn('href="docs/HERETIC_PLUGINS.md"', page)
 
 
 if __name__ == "__main__":

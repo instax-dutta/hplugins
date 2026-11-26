@@ -2,7 +2,7 @@
 
 1. Install DOX root contract and child AGENTS.md tree. Done before code.
 2. Write `PRODUCT.md`, design spec, surface brief, and this plan.
-3. Author `data/catalog.json` from `HERETIC_PLUGINS.md` with non-default community entries only.
+3. Author `data/catalog.json` from `docs/HERETIC_PLUGINS.md` with non-default community entries only.
 4. Write `tools/build.py` with validation and index generation; write `tests/test_build.py`.
 5. Write `index.html`, `assets/css/site.css`, and `assets/js/app.js` for the exploded-manifest UI.
 6. Self-host the two fonts and verify total transfer size.

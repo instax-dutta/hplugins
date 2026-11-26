@@ -13,7 +13,7 @@ Product record, design decisions, implementation plan, contributor guide, and ex
 - Design direction and token values belong in `DESIGN.md` and its sidecar `.impeccable/design.json`, never in the browser bundle.
 - `docs/superpowers/specs/` holds the design spec; `docs/plans/` holds the implementation plan.
 - `docs/contributing.md` is the instruction humans follow to add or update a catalog entry; entry pages are generated, never hand-written.
-- `HERETIC_PLUGINS.md` at the repo root is the extracted inventory of upstream and community material. Treat it as source evidence, not as site copy.
+- `docs/HERETIC_PLUGINS.md` is the extracted inventory of upstream and community material. Treat it as source evidence, not as site copy.
 
 ## Work Guidance
 

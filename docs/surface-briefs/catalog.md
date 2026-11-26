@@ -1,6 +1,6 @@
 # Surface brief: catalog (desktop-first web, read mode)
 
-Audience: Heretic users looking for a non-default scorer, modifier, config, or companion model, usually with a specific failure in mind. Job: find something that fits, understand it in one sentence, get the source, and leave with a setup prompt. Action: select an entry and copy its prompt. Proof: real entry text from `HERETIC_PLUGINS.md`; no invented screenshots or benchmarks. Constraints: GitHub Pages, no server, no dependencies, sub-100 KB of code and data.
+Audience: Heretic users looking for a non-default scorer, modifier, config, or companion model, usually with a specific failure in mind. Job: find something that fits, understand it in one sentence, get the source, and leave with a setup prompt. Action: select an entry and copy its prompt. Proof: real entry text from `docs/HERETIC_PLUGINS.md`; no invented screenshots or benchmarks. Constraints: GitHub Pages, no server, no dependencies, sub-100 KB of code and data.
 
 Chosen direction: **exploded parts manifest**, seed `28f5ae27`, candidate 7 of the grounded list, dice-assigned.
 

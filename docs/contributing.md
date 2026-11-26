@@ -4,7 +4,7 @@ Thanks for helping people find good Heretic work. The site is a static registry:
 
 ## What can be listed
 
-Community-made or non-default Heretic work: scorers, modifiers, configs, companion models, forks, and tools. Built-in default scorers are documented in `HERETIC_PLUGINS.md` and are not listed as entries.
+Community-made or non-default Heretic work: scorers, modifiers, configs, companion models, forks, and tools. Built-in default scorers are documented in `docs/HERETIC_PLUGINS.md` and are not listed as entries.
 
 ## Step 1: add one entry
 

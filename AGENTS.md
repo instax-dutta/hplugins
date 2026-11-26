@@ -80,7 +80,7 @@ Default section order:
 - Deploy target is GitHub Pages. No server runtime, no build framework, no npm dependencies at runtime.
 - `data/catalog.json` is the single source of truth. `tools/build.py` validates it and writes derived data.
 - Every catalog entry must carry a short description, a usage guide, a source link, and a copy-paste setup prompt.
-- The Krea 2 plugin sources shipped at the repo root are linked from their catalog entries; keep them present and served by Pages.
+- The Krea 2 plugin sources shipped in `plugins/` are linked from their catalog entries; keep them present and served by Pages.
 - Custom domain is `hplugins.sdad.pro`; the root `CNAME` file must keep that exact value.
 - The site CTA is "Contribute a part" and links to `docs/contributing.md` on GitHub.
 - PRs touching only catalog data, docs, or generated `entries/<slug>/index.html` pages auto-merge after all checks pass on the exact head commit; code, workflow, test, and asset changes require human review.
@@ -95,6 +95,7 @@ When the user requests a durable behavior change, record it here or in the relev
 
 - `assets/AGENTS.md` - browser shell, CSS tokens, JS rendering and routing, fonts
 - `data/AGENTS.md` - catalog entry schema and generated search index
-- `docs/AGENTS.md` - product/spec/plan records and contributor instructions
+- `docs/AGENTS.md` - product/spec/plan records, source inventory, and contributor instructions
+- `plugins/AGENTS.md` - shipped community plugin source files
 - `tools/AGENTS.md` - build, validation, and CI scripts
 - `tests/AGENTS.md` - catalog and build verification tests

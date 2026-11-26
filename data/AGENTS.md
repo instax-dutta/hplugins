@@ -17,7 +17,7 @@ The catalog source of truth and its generated lookup index.
 - `where_to_find` is a non-empty array of `{ label, url }` with `https://` URLs or local relative paths.
 - `setup_prompt` is written for a coding model with no Heretic context. It must name the plugin, the file path or model ID, the config keys, and a verification step.
 - A site-relative `where_to_find` URL must resolve to a real file in the repository; `tools/build.py` enforces this.
-- Entries describe community or non-default material only. Built-in default scorers are documented in `HERETIC_PLUGINS.md`, not catalogued as entries.
+- Entries describe community or non-default material only. Built-in default scorers are documented in `docs/HERETIC_PLUGINS.md`, not catalogued as entries.
 - Provenance is factual. Do not invent links, benchmarks, licenses, or authors. If a source was only discussed in chat, say so in `status` and link the discussion.
 
 ## Work Guidance

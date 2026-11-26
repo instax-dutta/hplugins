@@ -21,17 +21,17 @@
       },
       {
         "label": "Extracted inventory",
-        "url": "HERETIC_PLUGINS.md"
+        "url": "docs/HERETIC_PLUGINS.md"
       }
     ],
     "how_to_use": [
-      "Place krea2_drift.py in the working directory you run Heretic from.",
+      "Copy plugins/krea2_drift.py into the working directory you run Heretic from.",
       "Copy the [scorer.Krea2Drift] block from the source post into config.toml and set checkpoint_path to your local Krea 2 Turbo safetensors file.",
       "Keep optimization = none if you only want the number printed per trial.",
       "Run Heretic on Qwen3-VL-4B-Instruct and read the Krea 2 drift line in the trial output."
     ],
     "config_snippet": "scorers = [\n    { plugin = \"./krea2_drift.py:Krea2Drift\", optimization = \"none\" },\n]\n\n[scorer.Krea2Drift]\ncheckpoint_path = \"krea2turbo-bf16.safetensors\"\nmax_length = 512\nnoise_limit = 0.01\n\n[scorer.Krea2Drift.prompts]\ndataset = \"good_image_prompts.txt\"",
-    "setup_prompt": "Set up the Krea2Drift diagnostic scorer in my local Heretic installation. Create krea2_drift.py from the shared plugin file in the project root, next to config.toml. Add an entry { plugin = \"./krea2_drift.py:Krea2Drift\", optimization = \"none\" } to the scorers list in config.toml, then add [scorer.Krea2Drift] with checkpoint_path pointing at my local Krea 2 Turbo safetensors file, max_length = 512, noise_limit = 0.01, and a [scorer.Krea2Drift.prompts] section whose dataset is a local text file of image prompts. Keep optimization as none: this scorer is a measurement, not an objective. Use a Qwen3-VL model and tell me if my VRAM is below roughly 16 GB before running. Verify by starting a one-trial Heretic run and confirming a 'Krea 2 drift' line appears in the trial output. Do not generate an image and do not change any other scorer."
+    "setup_prompt": "Set up the Krea2Drift diagnostic scorer in my local Heretic installation. Copy plugins/krea2_drift.py into your Heretic working directory as krea2_drift.py. Add an entry { plugin = \"./krea2_drift.py:Krea2Drift\", optimization = \"none\" } to the scorers list in config.toml, then add [scorer.Krea2Drift] with checkpoint_path pointing at my local Krea 2 Turbo safetensors file, max_length = 512, noise_limit = 0.01, and a [scorer.Krea2Drift.prompts] section whose dataset is a local text file of image prompts. Keep optimization as none: this scorer is a measurement, not an objective. Use a Qwen3-VL model and tell me if my VRAM is below roughly 16 GB before running. Verify by starting a one-trial Heretic run and confirming a 'Krea 2 drift' line appears in the trial output. Do not generate an image and do not change any other scorer."
   },
   {
     "slug": "krea2-good",
@@ -55,17 +55,17 @@
       },
       {
         "label": "Local plugin source",
-        "url": "krea2_drift_v2.py"
+        "url": "plugins/krea2_drift_v2.py"
       }
     ],
     "how_to_use": [
-      "Put krea2_drift_v2.py in the directory you run Heretic from.",
+      "Copy plugins/krea2_drift_v2.py into the directory you run Heretic from.",
       "Add the Krea2Good and Krea2Bad entries to scorers, with Krea2Good set to minimize.",
       "Point [scorer.Krea2Good.prompts] at a file of good image prompts and keep a KL divergence scorer in the list.",
       "Compare the reported 'Krea2 good p90max' across trials; it should stay low while Krea2Bad rises."
     ],
     "config_snippet": "{ plugin = \"./krea2_drift_v2.py:Krea2Good\", optimization = \"minimize\" },\n\n[scorer.Krea2Good]\ncheckpoint_path = \"Krea2_turbo_bf16.safetensors\"\nmax_length = 512\nnoise_limit = 0.01\n\n[scorer.Krea2Good.prompts]\ndataset = \"GOOD_prompts.txt\"\nsplit = \"[:200]\"",
-    "setup_prompt": "Install the Krea2Good scorer in my Heretic working directory. Copy krea2_drift_v2.py next to config.toml. Add { plugin = \"./krea2_drift_v2.py:Krea2Good\", optimization = \"minimize\" } to the scorers list, keep a KLDivergence entry set to minimize, and add the matching Krea2Bad entry set to maximize. In [scorer.Krea2Good] set checkpoint_path to my local Krea 2 Turbo safetensors file, max_length = 512, measure_noise_floor = true, noise_limit = 0.01. In [scorer.Krea2Good.prompts] set dataset to a local good-image-prompt text file and split = \"[:200]\". This scorer measures conditioning drift, so use a Qwen3-VL model and keep the KL score low to avoid breaking the model. Verify with a short trial run and confirm a 'Krea2 good p90max' line in the output. Do not edit other scorers or the plugin code."
+    "setup_prompt": "Install the Krea2Good scorer in my Heretic working directory. Copy plugins/krea2_drift_v2.py into your Heretic working directory as krea2_drift_v2.py. Add { plugin = \"./krea2_drift_v2.py:Krea2Good\", optimization = \"minimize\" } to the scorers list, keep a KLDivergence entry set to minimize, and add the matching Krea2Bad entry set to maximize. In [scorer.Krea2Good] set checkpoint_path to my local Krea 2 Turbo safetensors file, max_length = 512, measure_noise_floor = true, noise_limit = 0.01. In [scorer.Krea2Good.prompts] set dataset to a local good-image-prompt text file and split = \"[:200]\". This scorer measures conditioning drift, so use a Qwen3-VL model and keep the KL score low to avoid breaking the model. Verify with a short trial run and confirm a 'Krea2 good p90max' line in the output. Do not edit other scorers or the plugin code."
   },
   {
     "slug": "krea2-bad",
@@ -89,17 +89,17 @@
       },
       {
         "label": "Local plugin source",
-        "url": "krea2_drift_v2.py"
+        "url": "plugins/krea2_drift_v2.py"
       }
     ],
     "how_to_use": [
-      "Install krea2_drift_v2.py beside config.toml and pair this scorer with Krea2Good.",
+      "Copy plugins/krea2_drift_v2.py into your Heretic working directory as krea2_drift_v2.py and pair this scorer with Krea2Good.",
       "Point [scorer.Krea2Bad.prompts] at a file of bad or restricted image prompts.",
       "Set optimization = maximize and keep KLDivergence minimizing.",
       "Look for Krea2 bad p90min above Krea2 good p90max as the intended result."
     ],
     "config_snippet": "{ plugin = \"./krea2_drift_v2.py:Krea2Bad\", optimization = \"maximize\" },\n\n[scorer.Krea2Bad]\ncheckpoint_path = \"Krea2_turbo_bf16.safetensors\"\nmax_length = 512\nnoise_limit = 0.01\n\n[scorer.Krea2Bad.prompts]\ndataset = \"BAD_prompts.txt\"\nsplit = \"[:200]\"",
-    "setup_prompt": "Install the Krea2Bad scorer in my Heretic working directory. Copy krea2_drift_v2.py next to config.toml and add { plugin = \"./krea2_drift_v2.py:Krea2Bad\", optimization = \"maximize\" } to the scorers list. Pair it with { plugin = \"./krea2_drift_v2.py:Krea2Good\", optimization = \"minimize\" } and with KLDivergence set to minimize. In [scorer.Krea2Bad] set checkpoint_path to my local Krea 2 Turbo safetensors file, max_length = 512, and noise_limit = 0.01. In [scorer.Krea2Bad.prompts] use a local file of restricted image prompts and split = \"[:200]\". The plugin is prompt-sensitive, so keep the KL score low and watch for a broken model. Verify by running a short trial and checking that a 'Krea2 bad p90min' line is printed and that it can exceed the good score. Do not modify other scorers."
+    "setup_prompt": "Install the Krea2Bad scorer in my Heretic working directory. Copy plugins/krea2_drift_v2.py into your Heretic working directory as krea2_drift_v2.py and add { plugin = \"./krea2_drift_v2.py:Krea2Bad\", optimization = \"maximize\" } to the scorers list. Pair it with { plugin = \"./krea2_drift_v2.py:Krea2Good\", optimization = \"minimize\" } and with KLDivergence set to minimize. In [scorer.Krea2Bad] set checkpoint_path to my local Krea 2 Turbo safetensors file, max_length = 512, and noise_limit = 0.01. In [scorer.Krea2Bad.prompts] use a local file of restricted image prompts and split = \"[:200]\". The plugin is prompt-sensitive, so keep the KL score low and watch for a broken model. Verify by running a short trial and checking that a 'Krea2 bad p90min' line is printed and that it can exceed the good score. Do not modify other scorers."
   },
   {
     "slug": "gibberish-rate",

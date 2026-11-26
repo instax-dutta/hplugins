@@ -137,7 +137,7 @@ def build_entry_pages(entries: list[dict]) -> dict[str, str]:
     for entry in entries:
         page = shell.replace('href="assets/', 'href="../../assets/')
         page = page.replace('src="assets/', 'src="../../assets/')
-        page = page.replace('href="HERETIC_PLUGINS.md"', 'href="../../HERETIC_PLUGINS.md"')
+        page = page.replace('href="docs/HERETIC_PLUGINS.md"', 'href="../../docs/HERETIC_PLUGINS.md"')
         meta = (
             '  <meta name="site-root" content="../../">\n'
             f'  <meta name="entry-slug" content="{entry["slug"]}">\n'

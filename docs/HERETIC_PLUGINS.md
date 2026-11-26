@@ -4,7 +4,7 @@ Compiled 2026-11-27 from:
 
 - `p-e-w/heretic` master (shallow clone, 241 commits): `src/heretic/scorers/`, `src/heretic/modifiers/`, `config.*.toml`
 - Discord `#general` export `general-1795720340987.json`: 19,685 messages, 2025-12-09 to 2026-11-26
-- Local files `krea2_drift.py` and `krea2_drift_v2.py`
+- Local sources in `plugins/`: `plugins/krea2_drift.py` and `plugins/krea2_drift_v2.py`
 
 ## 1. Plugin model
 

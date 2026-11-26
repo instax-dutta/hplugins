@@ -1,60 +1,40 @@
 # hplugins
 
-A static registry of community-made Heretic plugins, scorers, configs, models, and related work. Each entry has a one-sentence description, source links, a usage guide, and a setup prompt you can paste into a coding model to install it in your own Heretic checkout.
+**Community-built extensions for Heretic, collected in one place.**
 
-Live site: https://hplugins.sdad.pro
+hplugins is a public registry of scorers, modifiers, configs, models, and small tools made by people who use Heretic. Each listing gives you a plain-language description, the original source, a short usage guide, and a setup prompt you can hand to a coding model.
 
-## How it works
+**Visit the site:** https://hplugins.sdad.pro
 
-GitHub Pages serves static files only, so the "backend" is a build-time data layer:
+## What you will find
 
-- `data/catalog.json` is the single source of truth.
-- `tools/build.py` validates it, writes `data/search-index.json`, and derives one static page per entry.
-- The browser fetches the small index for the catalog list and the full catalog only when an entry page opens.
-- CI runs the same validation on every push and pull request. A guarded workflow auto-merges PRs that keep only catalog data, docs, and generated entry pages, provided every check passes on the exact PR commit.
+- **Scorers** that change what Heretic optimizes for
+- **Modifiers** and abliteration variants for different model behavior
+- **Configs** prepared for specific jobs, such as emotion steering or language-specific refusals
+- **Models and tools** that work alongside Heretic
 
-No framework, no npm, no CDN, no external font request. Total browser code and data is about 130 KB; fonts add about 54 KB.
+Every entry says what the thing does, who made it, and where to get it. Nothing is hidden behind an account or a signup form.
 
-## Repository layout
+## Using the site
 
-| Path | Purpose |
-| --- | --- |
-| `index.html` | Static catalog shell served by Pages |
-| `assets/` | CSS, JavaScript, fonts, favicon |
-| `data/catalog.json` | Authored catalog entries |
-| `data/search-index.json` | Generated search index; never hand-edit |
-| `entries/<slug>/index.html` | Generated entry pages; never hand-edit |
-| `plugins/` | Shipped Krea 2 scorer source files linked from the catalog |
-| `docs/` | Contributor guide, spec, plan, surface brief, and extracted source inventory |
-| `tools/` | Validator, entry-page generator, and auto-merge guard |
-| `tests/` | Offline `unittest` checks |
-| `.github/workflows/` | CI validation and auto-merge |
+1. Browse the list, or search by name, author, or keyword.
+2. Open a listing to read the guide and the source links.
+3. Copy the setup prompt and paste it into a coding model in the Heretic folder you use.
 
-Root files are limited to what Pages and the project tooling require: `CNAME`, `AGENTS.md`, `PRODUCT.md`, `DESIGN.md`, and this README.
+The prompt names the files and config keys to add, and includes a check so you can confirm the plugin loaded. The site itself never installs anything; it helps you install the work in your own Heretic checkout.
 
-## Run locally
+## Add your work
 
-```bash
-python3 tools/build.py
-python3 -m unittest discover -s tests -v
-python3 -m http.server 8000
-```
+If you built something useful with Heretic, it belongs here. Contributions are simple:
 
-Open `http://localhost:8000/` for the catalog and `http://localhost:8000/entries/krea2-drift/` for an entry. The older `#/p/<slug>` links still resolve.
+1. Add one entry to `data/catalog.json` with a short description, source link, usage steps, and setup prompt.
+2. Run `python3 tools/build.py` to check the entry and prepare its page.
+3. Open a pull request.
 
-## Contribute
+The automatic checks validate your entry. Pull requests that only add catalog entries or documentation are merged as soon as those checks pass. Changes to code or workflows are reviewed by a maintainer.
 
-See `docs/contributing.md`. Add one entry to `data/catalog.json`, run `python3 tools/build.py`, and commit the catalog, the regenerated search index, and the regenerated entry page. Pull requests that stay inside catalog data, docs, and generated entry pages are auto-merged once validation passes; code and workflow changes need a maintainer review.
+Step-by-step instructions, including the exact entry format, are in [docs/contributing.md](docs/contributing.md).
 
-## Deploy
+## About
 
-Push to `main`. Pages is configured to deploy the root of `main` at `hplugins.sdad.pro`. No build command runs on Pages, so generated files must be committed.
-
-## Verification
-
-```bash
-python3 tools/build.py --check
-python3 -m unittest discover -s tests -v
-```
-
-The workflow `check catalog` runs the same checks in CI. `auto-merge verified PRs` merges only after every check is green on the verified head commit.
+hplugins is built with plain HTML, CSS, and JavaScript and hosted on GitHub Pages. Sources stay attributed to their authors, and the catalog is open for anyone to improve.

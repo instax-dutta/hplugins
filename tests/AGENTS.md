@@ -6,7 +6,7 @@ Offline verification of the catalog and the build-time data layer.
 
 ## Ownership
 
-Test files here are the executable contract for `tools/build.py` and `data/catalog.json`.
+Test files here are the executable contract for `tools/build.py`, `tools/automerge_check.py`, and `data/catalog.json`.
 
 ## Local Contracts
 

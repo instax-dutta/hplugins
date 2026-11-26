@@ -18,6 +18,7 @@ The catalog source of truth and its generated lookup index.
 - `setup_prompt` is written for a coding model with no Heretic context. It must name the plugin, the file path or model ID, the config keys, and a verification step.
 - A site-relative `where_to_find` URL must resolve to a real file in the repository; `tools/build.py` enforces this.
 - Entries describe community or non-default material only. Built-in default scorers are documented in `docs/HERETIC_PLUGINS.md`, not catalogued as entries.
+- Links and instructions for shipped plugin sources use the `plugins/` prefix; the setup prompt then tells the user to copy that file into their own Heretic working directory.
 - Provenance is factual. Do not invent links, benchmarks, licenses, or authors. If a source was only discussed in chat, say so in `status` and link the discussion.
 
 ## Work Guidance

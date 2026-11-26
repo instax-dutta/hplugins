@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Everything the browser downloads: `index.html`, CSS, JavaScript, fonts, and generated data. No runtime dependencies beyond what GitHub Pages serves.
+Browser-facing presentation assets: CSS, JavaScript, fonts, and the favicon. The HTML shell lives at the repo root and the data lives in `data/`; this folder consumes both. No runtime dependencies beyond what GitHub Pages serves.
 
 ## Ownership
 
@@ -16,6 +16,8 @@ Static presentation and client-side behavior. `data/catalog.json` content is own
 - Motion must be transform/opacity only and disappear under `prefers-reduced-motion: reduce`.
 - JS expects `data/search-index.json`; on fetch failure it shows an inline error with a retry, never a blank page.
 - Self-hosted fonts in `assets/fonts/` with `font-display: swap`. Never link a font CDN.
+- Bump the `?v=` query on the CSS and JS links in the root `index.html` when either file changes so Cloudflare serves the new asset.
+- Generated entry pages under `entries/` reference these assets with `../../assets/`; never write absolute URLs into the shell.
 
 ## Work Guidance
 
@@ -25,7 +27,7 @@ Static presentation and client-side behavior. `data/catalog.json` content is own
 ## Verification
 
 - `python3 tools/build.py --check` validates data consumed by the UI.
-- Open `index.html` through a local HTTP server (`python3 -m http.server`) and exercise `#/`, `#/p/<slug>`, search, filters, theme toggle, and copy.
+- Open the root `index.html` through a local HTTP server (`python3 -m http.server`) and exercise `/`, `/entries/<slug>/`, search, filters, theme toggle, and copy. The `#/p/<slug>` form is a fallback check.
 
 ## Child DOX Index
 

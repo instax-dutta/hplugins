@@ -12,7 +12,7 @@ Source files for community plugins shipped with the registry so their catalog li
 
 - File names must match the `where_to_find` URLs in `data/catalog.json`; `tools/build.py` rejects local links that do not resolve to a file.
 - These are contributed artifacts. Do not rewrite their contents to "improve" them; upstream attribution stays intact.
-- They are served as static files by GitHub Pages and copied by the user into their own Heretic working directory.
+- Catalog links use the `plugins/` prefix. Setup prompts tell the user to copy the file into their own Heretic working directory, where the `./file.py:Class` plugin path applies.
 
 ## Work Guidance
 

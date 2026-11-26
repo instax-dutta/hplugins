@@ -167,7 +167,7 @@
   function renderCatalog() {
     document.title = "hplugins - community Heretic plugins";
     view.innerHTML =
-      '<header class="catalog-head"><h1 class="catalog-title">Do more with Heretic.</h1>' +
+      '<header class="catalog-head"><h1 class="catalog-title">Community-built plugins for Heretic.</h1>' +
       '<p class="catalog-intro">Community-built scorers, modifiers, and configs. Every entry has a source, a guide, ' +
       'and a prompt your coding model can follow.</p></header>' +
       '<div class="toolbar">' +

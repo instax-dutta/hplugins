@@ -84,6 +84,7 @@ Default section order:
 - Custom domain is `hplugins.sdad.pro`; the root `CNAME` file must keep that exact value.
 - The site CTA is "Contribute a part" and links to `docs/contributing.md` on GitHub.
 - PRs touching only catalog data or docs auto-merge after all checks pass on the exact head commit; code, workflow, test, and asset changes require human review.
+- Bump the `?v=` query on the CSS and JS links in `index.html` whenever either file changes, so Cloudflare serves the new asset instead of a cached copy.
 
 ## User Preferences
 

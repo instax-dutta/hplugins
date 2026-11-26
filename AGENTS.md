@@ -89,7 +89,7 @@ Default section order:
 - The root `index.html`, entry pages, and discovery files (`robots.txt`, `sitemap.xml`, `llms.txt`, `llms-full.txt`) are generated artifacts. Edit the template and catalog, never the generated output.
 - `tools/automerge_check.py` is the pure auto-merge guard. It only reads API payloads prepared by `.github/workflows/auto-merge.yml`; it never fetches or mutates anything itself.
 - Hidden directories `.github/` and `.impeccable/` are owned by this root contract; neither has a child DOX file.
-- `GEO-AUDIT-REPORT.md` records the current GEO score and the remaining off-site gaps; do not fabricate mentions or dates to improve it.
+- `docs/audits/GEO-AUDIT-REPORT.md` records the current GEO score and the remaining off-site gaps; do not fabricate mentions or dates to improve it.
 
 ## User Preferences
 

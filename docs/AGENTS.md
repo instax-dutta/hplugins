@@ -27,4 +27,4 @@ Root `PRODUCT.md` and `DESIGN.md`, plus files under `docs/`, are durable project
 
 ## Child DOX Index
 
-None.
+- `audits/AGENTS.md` - audit reports and their evidence rules

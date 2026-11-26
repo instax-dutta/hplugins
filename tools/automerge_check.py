@@ -21,6 +21,27 @@ GOOD_CONCLUSIONS = {"success", "neutral", "skipped"}
 BAD_MERGE_STATES = {"dirty", "blocked", "behind", "unstable"}
 
 
+def normalize_list(payload: object, key: str | None = None) -> list:
+    """Flatten API payloads from both direct and ``--paginate --slurp`` calls."""
+    if payload is None:
+        return []
+    if isinstance(payload, dict):
+        value = payload.get(key, []) if key else payload
+        return list(value) if isinstance(value, list) else [value]
+    if not isinstance(payload, list):
+        return []
+    output: list = []
+    for item in payload:
+        if isinstance(item, list):
+            output.extend(item)
+        elif isinstance(item, dict) and key and key in item:
+            value = item[key]
+            output.extend(value if isinstance(value, list) else [value])
+        else:
+            output.append(item)
+    return output
+
+
 def merge_decision(
     run: dict,
     pr: dict,
@@ -58,7 +79,7 @@ def merge_decision(
         return "SKIP: PR review list is unavailable"
     if any(
         isinstance(review, dict) and review.get("state") == "CHANGES_REQUESTED"
-        for review in reviews
+        for review in normalize_list(reviews)
     ):
         return "SKIP: PR has a requested change"
 
@@ -70,8 +91,8 @@ def merge_decision(
     if any(thread.get("isResolved") is False for thread in nodes.get("nodes", [])):
         return "SKIP: PR has unresolved review threads"
 
-    check_runs = checks.get("check_runs", checks) if isinstance(checks, dict) else checks
-    if not isinstance(check_runs, list) or not check_runs:
+    check_runs = normalize_list(checks, "check_runs")
+    if not check_runs:
         return "SKIP: no check runs found for the head commit"
     if not any(
         check.get("name") == "validate"
@@ -88,7 +109,7 @@ def merge_decision(
 
     if not isinstance(files, list) or not files:
         return "SKIP: PR file list is unavailable"
-    for changed in files:
+    for changed in normalize_list(files):
         for key in ("filename", "previous_filename"):
             path = changed.get(key)
             if path and not ALLOWED_PATH.match(path):

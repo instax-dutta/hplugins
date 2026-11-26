@@ -93,6 +93,18 @@ class GuardTests(unittest.TestCase):
         threads["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"] = [{"isResolved": False}]
         self.assertTrue(decide(threads=threads).startswith("SKIP"))
 
+    def test_paginated_payload_shapes_are_flattened(self):
+        checks = [{"total_count": 1, "check_runs": [
+            {"name": "validate", "status": "completed", "conclusion": "success"}]}]
+        reviews = [[{"state": "APPROVED"}]]
+        files = [[{"filename": "data/catalog.json"}]]
+        self.assertEqual(decide(checks=checks, reviews=reviews, files=files), "MERGE")
+
+    def test_paginated_failed_check_blocks_merge(self):
+        checks = [{"check_runs": [
+            {"name": "validate", "status": "completed", "conclusion": "failure"}]}]
+        self.assertTrue(decide(checks=checks).startswith("SKIP"))
+
     def test_malformed_review_payloads_block_merge(self):
         self.assertTrue(decide(reviews={}).startswith("SKIP"))
         self.assertTrue(decide(threads={}).startswith("SKIP"))

@@ -7,7 +7,7 @@ A lightweight registry of community-made and non-default Heretic plugins, scorer
 GitHub Pages serves static files. There is no server runtime, so the "backend" is a build-time data layer:
 
 - `data/catalog.json` is the only source of truth.
-- `tools/build.py` validates every entry, writes `data/search-index.json`, and generates one static `/<slug>/index.html` page per entry.
+- `tools/build.py` validates every entry, writes `data/search-index.json`, and generates one static `entries/<slug>/index.html` page per entry.
 - The browser fetches the small index for the list and loads the full catalog only when an entry page is opened.
 - CI runs the same validator in read-only mode on every push.
 
@@ -21,7 +21,7 @@ python3 -m unittest discover -s tests -v
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000/`. Entry URLs are clean paths such as `/krea2-drift/`; the older `#/p/<slug>` links still work.
+Open `http://localhost:8000/`. Entry URLs are clean paths such as `/entries/krea2-drift/`; the older `#/p/<slug>` links still work.
 
 ## Deploy
 

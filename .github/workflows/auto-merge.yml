@@ -17,7 +17,44 @@ jobs:
       github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - name: Verify exact commit, checks, and scope, then merge
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Gather verification payloads from the base repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+        run: |
+          set -euo pipefail
+
+          pr="$PR_NUMBER"
+          if [ -z "$pr" ]; then
+            pr=$(gh api "repos/$REPO/commits/$HEAD_SHA/pulls" --jq '.[0].number // empty')
+          fi
+          if [ -z "$pr" ]; then
+            echo "No pull request found for $HEAD_SHA"
+            exit 0
+          fi
+          echo "PR_NUMBER=$pr" >> "$GITHUB_ENV"
+
+          gh api "repos/$REPO/actions/runs/$RUN_ID" > run.json
+          gh api "repos/$REPO/pulls/$pr" > pr.json
+          gh api "repos/$REPO/commits/$HEAD_SHA/check-runs" --paginate --slurp > checks.json
+          gh api "repos/$REPO/pulls/$pr/reviews" --paginate --slurp > reviews.json
+          gh api "repos/$REPO/pulls/$pr/files" --paginate --slurp > files.json
+          gh api graphql \
+            -f query='query($owner:String!,$repo:String!,$number:Int!){repository(owner:$owner,name:$repo){pullRequest(number:$number){reviewThreads(first:100){pageInfo{hasNextPage}nodes{isResolved}}}}}' \
+            -f owner="${REPO%%/*}" -f repo="${REPO##*/}" -F number="$pr" > threads.json
+
+      - name: Decide and merge
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
@@ -25,65 +62,16 @@ jobs:
         run: |
           set -euo pipefail
 
-          pr=$(gh api "repos/$REPO/commits/$HEAD_SHA/pulls" --jq '.[0].number // empty')
-          if [ -z "$pr" ]; then
-            echo "No open pull request found for $HEAD_SHA"
+          decision=$(python3 tools/automerge_check.py .)
+          echo "$decision"
+          if [ "$decision" != "MERGE" ]; then
             exit 0
           fi
 
-          pr_json=$(gh api "repos/$REPO/pulls/$pr")
-          state=$(echo "$pr_json" | jq -r '.state')
-          draft=$(echo "$pr_json" | jq -r '.draft')
-          pr_sha=$(echo "$pr_json" | jq -r '.head.sha')
-          base=$(echo "$pr_json" | jq -r '.base.ref')
-
-          if [ "$state" != "open" ] || [ "$draft" != "false" ]; then
-            echo "PR is closed or still a draft; skipping"
-            exit 0
-          fi
-          if [ "$pr_sha" != "$HEAD_SHA" ]; then
-            echo "PR head moved after checks ran; skipping"
-            exit 0
-          fi
-          if [ "$base" != "main" ]; then
-            echo "PR targets $base, not main; skipping"
+          current=$(gh api "repos/$REPO/pulls/$PR_NUMBER" --jq '.head.sha')
+          if [ "$current" != "$HEAD_SHA" ]; then
+            echo "PR changed after verification; skipping"
             exit 0
           fi
 
-          failed=$(gh api "repos/$REPO/commits/$HEAD_SHA/check-runs" \
-            --jq '[.check_runs[] | select(.status != "completed" or (.conclusion != "success" and .conclusion != "neutral" and .conclusion != "skipped")) | .name] | join(", ")')
-          if [ -n "$failed" ]; then
-            echo "Checks are not green: $failed"
-            exit 0
-          fi
-
-          unresolved=$(gh api graphql \
-            -f query='query($owner:String!,$repo:String!,$number:Int!){repository(owner:$owner,name:$repo){pullRequest(number:$number){reviewThreads(first:100){nodes{isResolved}}}}}' \
-            -f owner="${REPO%%/*}" -f repo="${REPO##*/}" -F number="$pr" \
-            --jq '[.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)] | length')
-          if [ "$unresolved" != "0" ]; then
-            echo "PR has unresolved review threads; skipping"
-            exit 0
-          fi
-
-          files=$(gh api "repos/$REPO/pulls/$pr/files" --paginate --jq '.[].filename')
-          manual=$(echo "$files" | grep -vE '^(data/|docs/|[a-z0-9-]+/index\.html$|HERETIC_PLUGINS\.md$|README\.md$|DESIGN\.md$|PRODUCT\.md$|AGENTS\.md$)' || true)
-          if [ -n "$manual" ]; then
-            echo "Manual review required for files outside catalog and docs:"
-            echo "$manual"
-            exit 0
-          fi
-
-          mergeable=$(echo "$pr_json" | jq -r '.mergeable')
-          for attempt in 1 2 3; do
-            if [ "$mergeable" != "null" ]; then break; fi
-            sleep 5
-            mergeable=$(gh api "repos/$REPO/pulls/$pr" --jq '.mergeable')
-          done
-          if [ "$mergeable" != "true" ]; then
-            echo "PR is not mergeable; skipping"
-            exit 0
-          fi
-
-          echo "All checks passed on $HEAD_SHA; merging PR #$pr"
-          gh pr merge "$pr" --repo "$REPO" --squash
+          gh pr merge "$PR_NUMBER" --repo "$REPO" --squash

@@ -6,7 +6,7 @@ The build-time data layer: validation, index generation, and CI wiring.
 
 ## Ownership
 
-`tools/build.py` is the only writer of `data/search-index.json` and of the `/<slug>/index.html` entry pages. CI runs the same script in check mode.
+`tools/build.py` is the only writer of `data/search-index.json` and of the `entries/<slug>/index.html` entry pages. CI runs the same script in check mode.
 
 ## Local Contracts
 

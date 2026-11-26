@@ -73,7 +73,7 @@ Then visit `http://localhost:8000/#/p/<your-slug>` and confirm the entry renders
 
 ## Step 3: open a pull request
 
-Commit `data/catalog.json`, the regenerated `data/search-index.json`, and the regenerated `<slug>/index.html` entry page. Do not hand-write entry pages; `tools/build.py` derives them from `index.html`, and the live URL becomes `https://hplugins.sdad.pro/<slug>/`. Use this PR format:
+Commit `data/catalog.json`, the regenerated `data/search-index.json`, and the regenerated `entries/<slug>/index.html` entry page. Do not hand-write entry pages; `tools/build.py` derives them from `index.html`, and the live URL becomes `https://hplugins.sdad.pro/entries/<slug>/`. Use this PR format:
 
 **Title:** `Add <Name> (<type>)` or `Update <Name>`
 

@@ -5,6 +5,7 @@
   var rootMeta = document.querySelector('meta[name="site-root"]');
   var slugMeta = document.querySelector('meta[name="entry-slug"]');
   var SITE_ROOT = rootMeta ? rootMeta.getAttribute("content") : "";
+  var ENTRY_BASE = SITE_ROOT ? "../" : "entries/";
   var ENTRY_SLUG = slugMeta ? slugMeta.getAttribute("content") : null;
   var INDEX_URL = SITE_ROOT + "data/search-index.json";
   var CATALOG_URL = SITE_ROOT + "data/catalog.json";
@@ -69,8 +70,9 @@
   function parseRoute() {
     if (ENTRY_SLUG) return { kind: "detail", slug: ENTRY_SLUG };
     var segments = window.location.pathname.split("/").filter(Boolean);
-    if (segments.length === 1 && state.index.some(function (item) { return item.slug === segments[0]; })) {
-      return { kind: "detail", slug: segments[0] };
+    var last = segments[segments.length - 1];
+    if (last && state.index.some(function (item) { return item.slug === last; })) {
+      return { kind: "detail", slug: last };
     }
     var match = (window.location.hash || "").match(/^#\/p\/([a-z0-9-]+)$/);
     return match ? { kind: "detail", slug: match[1] } : { kind: "list" };
@@ -126,7 +128,7 @@
 
     list.innerHTML = items.map(function (item, i) {
       return '<li><a class="entry-row" style="--i:' + Math.min(i, 12) + '" href="' +
-        SITE_ROOT + esc(item.slug) + '/">' +
+        ENTRY_BASE + esc(item.slug) + '/">' +
         '<span class="entry-index">' + pad(i + 1) + '</span>' +
         '<span class="entry-body"><span class="entry-name">' + esc(item.name) + '</span>' +
         '<span class="entry-summary">' + esc(item.summary) + '</span></span>' +
@@ -279,8 +281,8 @@
         '<pre class="code-block">' + esc(entry.config_snippet) + "</pre></section>" : "") +
       manifest(entry) +
       '<nav class="pair-nav">' +
-      (previous ? '<a href="' + SITE_ROOT + esc(previous) + '/">Previous part</a>' : "<span></span>") +
-      (next ? '<a href="' + SITE_ROOT + esc(next) + '/">Next part</a>' : "<span></span>") +
+      (previous ? '<a href="' + ENTRY_BASE + esc(previous) + '/">Previous part</a>' : "<span></span>") +
+      (next ? '<a href="' + ENTRY_BASE + esc(next) + '/">Next part</a>' : "<span></span>") +
       "</nav></div>";
 
     bindCopy(entry);

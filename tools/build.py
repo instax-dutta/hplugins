@@ -16,6 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG = ROOT / "data" / "catalog.json"
 INDEX = ROOT / "data" / "search-index.json"
+ENTRIES_DIR = ROOT / "entries"
 
 REQUIRED = (
     "slug", "name", "type", "author", "summary", "description", "status",
@@ -134,11 +135,11 @@ def build_entry_pages(entries: list[dict]) -> dict[str, str]:
     shell = (ROOT / "index.html").read_text(encoding="utf-8")
     pages = {}
     for entry in entries:
-        page = shell.replace('href="assets/', 'href="../assets/')
-        page = page.replace('src="assets/', 'src="../assets/')
-        page = page.replace('href="HERETIC_PLUGINS.md"', 'href="../HERETIC_PLUGINS.md"')
+        page = shell.replace('href="assets/', 'href="../../assets/')
+        page = page.replace('src="assets/', 'src="../../assets/')
+        page = page.replace('href="HERETIC_PLUGINS.md"', 'href="../../HERETIC_PLUGINS.md"')
         meta = (
-            '  <meta name="site-root" content="../">\n'
+            '  <meta name="site-root" content="../../">\n'
             f'  <meta name="entry-slug" content="{entry["slug"]}">\n'
         )
         page = page.replace(
@@ -149,10 +150,25 @@ def build_entry_pages(entries: list[dict]) -> dict[str, str]:
     return pages
 
 
+def legacy_entry_dirs() -> list[Path]:
+    """Find entry pages left at the repo root by an older layout."""
+    found = []
+    for directory in ROOT.iterdir():
+        page = directory / "index.html"
+        if not directory.is_dir() or not page.is_file():
+            continue
+        text = page.read_text(encoding="utf-8", errors="replace")
+        if 'name="entry-slug"' in text:
+            found.append(directory)
+    return found
+
+
 def stale_entry_dirs(slugs: set[str]) -> list[Path]:
     """Find generated entry pages whose slug is no longer in the catalog."""
     stale = []
-    for directory in ROOT.iterdir():
+    if not ENTRIES_DIR.is_dir():
+        return []
+    for directory in ENTRIES_DIR.iterdir():
         page = directory / "index.html"
         if not directory.is_dir() or not page.is_file():
             continue
@@ -187,7 +203,7 @@ def main() -> int:
             print("INVALID search index is missing or stale; run tools/build.py", file=sys.stderr)
             return 1
         for slug, page in pages.items():
-            target = ROOT / slug / "index.html"
+            target = ENTRIES_DIR / slug / "index.html"
             if not target.is_file() or target.read_text(encoding="utf-8") != page:
                 print(f"INVALID entry page for {slug} is missing or stale; run tools/build.py", file=sys.stderr)
                 return 1
@@ -198,10 +214,10 @@ def main() -> int:
     else:
         INDEX.write_text(generated, encoding="utf-8")
         for slug, page in pages.items():
-            target = ROOT / slug / "index.html"
+            target = ENTRIES_DIR / slug / "index.html"
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(page, encoding="utf-8")
-        for directory in stale_entry_dirs(slugs):
+        for directory in stale_entry_dirs(slugs) + legacy_entry_dirs():
             shutil.rmtree(directory)
 
     counts: dict[str, int] = {}

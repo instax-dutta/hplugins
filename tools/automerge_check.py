@@ -8,6 +8,8 @@ It never fetches or mutates anything itself. Output is either ``MERGE`` or
 
 from __future__ import annotations
 
+# Negative-control PR: comment only, no behavior change.
+
 import json
 import re
 import sys

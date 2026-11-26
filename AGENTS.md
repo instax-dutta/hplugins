@@ -81,6 +81,7 @@ Default section order:
 - `data/catalog.json` is the single source of truth. `tools/build.py` validates it and writes derived data.
 - Every catalog entry must carry a short description, a usage guide, a source link, and a copy-paste setup prompt.
 - The Krea 2 plugin sources shipped at the repo root are linked from their catalog entries; keep them present and served by Pages.
+- Custom domain is `hplugins.sdad.pro`; the root `CNAME` file must keep that exact value.
 
 ## User Preferences
 

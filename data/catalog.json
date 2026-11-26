@@ -1,0 +1,289 @@
+[
+  {
+    "slug": "krea2-drift",
+    "name": "Krea2Drift",
+    "type": "scorer",
+    "author": "zubzer0",
+    "summary": "Measures how far an ablation shifts the text conditioning that Krea 2 feeds to its image model, without generating an image.",
+    "description": "Reads the fused text tensor from twelve tapped Qwen3-VL layers and reports the mean token cosine drift against the unmodified model, in percent. It is a diagnostic: the shared config uses optimization = none so the score is visible without steering the optimizer. Very sensitive to prompt choice, and it needs a Krea 2 Turbo safetensors checkpoint and roughly 16 GB of VRAM.",
+    "status": "community",
+    "tags": ["scorer", "krea2", "qwen3-vl", "image", "diagnostic"],
+    "where_to_find": [
+      { "label": "Discord post with config", "url": "https://discord.com/channels/1447831134212984903/1447845008534405270" },
+      { "label": "Extracted inventory", "url": "HERETIC_PLUGINS.md" }
+    ],
+    "how_to_use": [
+      "Place krea2_drift.py in the working directory you run Heretic from.",
+      "Copy the [scorer.Krea2Drift] block from the source post into config.toml and set checkpoint_path to your local Krea 2 Turbo safetensors file.",
+      "Keep optimization = none if you only want the number printed per trial.",
+      "Run Heretic on Qwen3-VL-4B-Instruct and read the Krea 2 drift line in the trial output."
+    ],
+    "config_snippet": "scorers = [\n    { plugin = \"./krea2_drift.py:Krea2Drift\", optimization = \"none\" },\n]\n\n[scorer.Krea2Drift]\ncheckpoint_path = \"krea2turbo-bf16.safetensors\"\nmax_length = 512\nnoise_limit = 0.01\n\n[scorer.Krea2Drift.prompts]\ndataset = \"good_image_prompts.txt\"",
+    "setup_prompt": "Set up the Krea2Drift diagnostic scorer in my local Heretic installation. Create krea2_drift.py from the shared plugin file in the project root, next to config.toml. Add an entry { plugin = \"./krea2_drift.py:Krea2Drift\", optimization = \"none\" } to the scorers list in config.toml, then add [scorer.Krea2Drift] with checkpoint_path pointing at my local Krea 2 Turbo safetensors file, max_length = 512, noise_limit = 0.01, and a [scorer.Krea2Drift.prompts] section whose dataset is a local text file of image prompts. Keep optimization as none: this scorer is a measurement, not an objective. Use a Qwen3-VL model and tell me if my VRAM is below roughly 16 GB before running. Verify by starting a one-trial Heretic run and confirming a 'Krea 2 drift' line appears in the trial output. Do not generate an image and do not change any other scorer."
+  },
+  {
+    "slug": "krea2-good",
+    "name": "Krea2Good",
+    "type": "scorer",
+    "author": "zubzer0",
+    "summary": "Minimizes the p90 drift of good image prompts so an ablation leaves benign Krea 2 conditioning stable.",
+    "description": "The first half of a paired scorer for image-generating VLMs. It takes the largest conditioning drift left after discarding the ten percent of prompts that moved most, then asks the optimizer to minimize it. Lower values mean the good prompts kept their original trajectory. Use it together with Krea2Bad and a KL divergence scorer.",
+    "status": "community",
+    "tags": ["scorer", "krea2", "qwen3-vl", "image", "minimize"],
+    "where_to_find": [
+      { "label": "Discord post with config", "url": "https://discord.com/channels/1447831134212984903/1447845008534405270" },
+      { "label": "Local plugin source", "url": "krea2_drift_v2.py" }
+    ],
+    "how_to_use": [
+      "Put krea2_drift_v2.py in the directory you run Heretic from.",
+      "Add the Krea2Good and Krea2Bad entries to scorers, with Krea2Good set to minimize.",
+      "Point [scorer.Krea2Good.prompts] at a file of good image prompts and keep a KL divergence scorer in the list.",
+      "Compare the reported 'Krea2 good p90max' across trials; it should stay low while Krea2Bad rises."
+    ],
+    "config_snippet": "{ plugin = \"./krea2_drift_v2.py:Krea2Good\", optimization = \"minimize\" },\n\n[scorer.Krea2Good]\ncheckpoint_path = \"Krea2_turbo_bf16.safetensors\"\nmax_length = 512\nnoise_limit = 0.01\n\n[scorer.Krea2Good.prompts]\ndataset = \"GOOD_prompts.txt\"\nsplit = \"[:200]\"",
+    "setup_prompt": "Install the Krea2Good scorer in my Heretic working directory. Copy krea2_drift_v2.py next to config.toml. Add { plugin = \"./krea2_drift_v2.py:Krea2Good\", optimization = \"minimize\" } to the scorers list, keep a KLDivergence entry set to minimize, and add the matching Krea2Bad entry set to maximize. In [scorer.Krea2Good] set checkpoint_path to my local Krea 2 Turbo safetensors file, max_length = 512, measure_noise_floor = true, noise_limit = 0.01. In [scorer.Krea2Good.prompts] set dataset to a local good-image-prompt text file and split = \"[:200]\". This scorer measures conditioning drift, so use a Qwen3-VL model and keep the KL score low to avoid breaking the model. Verify with a short trial run and confirm a 'Krea2 good p90max' line in the output. Do not edit other scorers or the plugin code."
+  },
+  {
+    "slug": "krea2-bad",
+    "name": "Krea2Bad",
+    "type": "scorer",
+    "author": "zubzer0",
+    "summary": "Maximizes the p90 drift of bad image prompts so abliteration visibly changes how the model handles them.",
+    "description": "The second half of the paired Krea 2 scorer. It keeps the smallest conditioning drift after discarding the ten percent of prompts that moved least, then maximizes it. The author's sign of success is Krea2Bad p90min rising above Krea2Good p90max. It correlates with refusal rate on image prompts, so it is useful only alongside a quality scorer such as KL divergence.",
+    "status": "community",
+    "tags": ["scorer", "krea2", "qwen3-vl", "image", "maximize"],
+    "where_to_find": [
+      { "label": "Discord post with config", "url": "https://discord.com/channels/1447831134212984903/1447845008534405270" },
+      { "label": "Local plugin source", "url": "krea2_drift_v2.py" }
+    ],
+    "how_to_use": [
+      "Install krea2_drift_v2.py beside config.toml and pair this scorer with Krea2Good.",
+      "Point [scorer.Krea2Bad.prompts] at a file of bad or restricted image prompts.",
+      "Set optimization = maximize and keep KLDivergence minimizing.",
+      "Look for Krea2 bad p90min above Krea2 good p90max as the intended result."
+    ],
+    "config_snippet": "{ plugin = \"./krea2_drift_v2.py:Krea2Bad\", optimization = \"maximize\" },\n\n[scorer.Krea2Bad]\ncheckpoint_path = \"Krea2_turbo_bf16.safetensors\"\nmax_length = 512\nnoise_limit = 0.01\n\n[scorer.Krea2Bad.prompts]\ndataset = \"BAD_prompts.txt\"\nsplit = \"[:200]\"",
+    "setup_prompt": "Install the Krea2Bad scorer in my Heretic working directory. Copy krea2_drift_v2.py next to config.toml and add { plugin = \"./krea2_drift_v2.py:Krea2Bad\", optimization = \"maximize\" } to the scorers list. Pair it with { plugin = \"./krea2_drift_v2.py:Krea2Good\", optimization = \"minimize\" } and with KLDivergence set to minimize. In [scorer.Krea2Bad] set checkpoint_path to my local Krea 2 Turbo safetensors file, max_length = 512, and noise_limit = 0.01. In [scorer.Krea2Bad.prompts] use a local file of restricted image prompts and split = \"[:200]\". The plugin is prompt-sensitive, so keep the KL score low and watch for a broken model. Verify by running a short trial and checking that a 'Krea2 bad p90min' line is printed and that it can exceed the good score. Do not modify other scorers."
+  },
+  {
+    "slug": "gibberish-rate",
+    "name": "GibberishRate",
+    "type": "scorer",
+    "author": "randomlygeneratedusername",
+    "summary": "Flags trials whose responses turn into gibberish by counting distinct Unicode scripts.",
+    "description": "A community scorer written with coding-model assistance after ARA runs produced incoherent outputs. It probes a few prompts per trial and classifies a response as gibberish when it contains more than a configured number of distinct scripts. By default it skips or aborts affected trials rather than adding another optimization objective. No source repository was published; only the config snippet is available.",
+    "status": "proof-of-concept",
+    "tags": ["scorer", "gibberish", "unicode", "ara", "guardrail"],
+    "where_to_find": [
+      { "label": "Discord config snippet", "url": "https://discord.com/channels/1447831134212984903/1447845008534405270" },
+      { "label": "Heretic plugin interface", "url": "https://github.com/p-e-w/heretic/blob/master/src/heretic/scorer.py" }
+    ],
+    "how_to_use": [
+      "Find or write a GibberishRate plugin class that reads n_prompts, max_scripts, and min_characters_per_script from its config section.",
+      "Save it as gibberish_rate.py next to config.toml.",
+      "Add the [scorer.GibberishRate] block from the source snippet, with optimization = none if you only want bad trials skipped.",
+      "Run a short ARA trial set and confirm the probe responses are checked."
+    ],
+    "config_snippet": "[scorer.GibberishRate]\nn_prompts = 5\nmax_scripts = 3\nmin_characters_per_script = 1\nprint_responses = false\n\n[scorer.GibberishRate.prompts]\ndataset = \"mlabonne/harmless_alpaca\"\nsplit = \"test[:100]\"\ncolumn = \"text\"",
+    "setup_prompt": "Add a gibberish guardrail to my local Heretic setup. The community config uses a scorer named GibberishRate with settings n_prompts = 5, max_scripts = 3, min_characters_per_script = 1, and print_responses = false, with prompts from mlabonne/harmless_alpaca split test[:100]. No source file was published, so first check whether a GibberishRate class exists in my checkout or in a plugin I already have. If it does, register it with optimization = none so it skips bad trials without adding an optimization objective, and add the settings above under [scorer.GibberishRate]. If no implementation exists, stop and tell me that this entry needs a plugin class rather than inventing one. Verify with a short ARA run and confirm the probe prompts are evaluated before trial selection."
+  },
+  {
+    "slug": "calibrated-piqa",
+    "name": "Calibrated PIQA",
+    "type": "scorer",
+    "author": "electroglyph",
+    "summary": "A fork of Heretic with a benchmark scorer tuned to PIQA questions that flip between right and wrong.",
+    "description": "Built on the mainline BenchmarkScore idea, this fork repeatedly evaluates a model, keeps questions whose answers flip-flop, and batches those questions to get a higher-signal quality metric. It was used while comparing ablated models against GPQA results. The author reports a modest improvement in signal over plain PIQA, not a perfect correlation.",
+    "status": "community",
+    "tags": ["scorer", "benchmark", "piqa", "gpqa", "fork"],
+    "where_to_find": [
+      { "label": "Fork with the scorer", "url": "https://github.com/electroglyph/heretic" },
+      { "label": "Benchmark results model", "url": "https://huggingface.co/electroglyph/Spark-X2.6-4B-benchmarks-gpqa" }
+    ],
+    "how_to_use": [
+      "Clone the fork instead of mainline Heretic if you want the author's exact scorer.",
+      "Configure a BenchmarkScore-style entry with optimization = maximize and select the calibrated task the fork defines.",
+      "Compare its score against KL divergence on the same trials before trusting it.",
+      "Use a short benchmark so it stays fast enough for trial-level scoring."
+    ],
+    "config_snippet": "scorers = [\n    { plugin = \"heretic.scorers.keyword_rate.KeywordRate\", optimization = \"minimize\" },\n    { plugin = \"heretic.scorers.benchmark_score.BenchmarkScore\", optimization = \"maximize\" },\n]\n\n[scorer.BenchmarkScore]\ntask = \"piqa\"\nmetric = \"acc_norm,none\"",
+    "setup_prompt": "Set up electroglyph's calibrated PIQA approach in my local Heretic checkout. First inspect https://github.com/electroglyph/heretic and identify the benchmark scorer it adds for repeatedly sampling PIQA and keeping flip-flopping questions. If I already have that fork checked out, register its scorer in the scorers list with optimization = maximize and keep KeywordRate minimizing. If I have mainline Heretic, explain that the closest built-in option is heretic.scorers.benchmark_score.BenchmarkScore with task = \"piqa\" and metric = \"acc_norm,none\", and offer to configure that instead. Do not claim the calibrated variant is present when it is not. Verify by running one trial and confirming a benchmark score is printed."
+  },
+  {
+    "slug": "llm-judge",
+    "name": "LLM Judge scorer",
+    "type": "scorer",
+    "author": "kurigohanandkamehameha",
+    "summary": "Uses a separate language model to decide whether a response actually complies, instead of matching refusal keywords.",
+    "description": "A pull request that sends responses to a judge model through an OpenAI-compatible API and classifies them. It was motivated by thinking models that refuse inside the reasoning trace and by unusual refusal formats that keyword lists miss. The author found that running the judge as an external API client worked better than loading it inside the Heretic process.",
+    "status": "proof-of-concept",
+    "tags": ["scorer", "llm-judge", "refusals", "api", "pr"],
+    "where_to_find": [
+      { "label": "Plugin system PR discussion", "url": "https://github.com/p-e-w/heretic/pull/53" },
+      { "label": "Mainline scorer interface", "url": "https://github.com/p-e-w/heretic/blob/master/src/heretic/scorer.py" }
+    ],
+    "how_to_use": [
+      "Check whether the LLM judge PR has been adapted to your Heretic version; the plugin interface changed between 1.x and 2.x.",
+      "Configure a reachable OpenAI-compatible endpoint and a judge model with enough context for the full response.",
+      "Register the judge scorer with optimization = minimize so judged refusals go down.",
+      "Compare its verdicts against KeywordRate on a small response sample before a long run."
+    ],
+    "config_snippet": "scorers = [\n    { plugin = \"./llm_judge.py:LLMJudge\", optimization = \"minimize\" },\n    { plugin = \"heretic.scorers.kl_divergence.KLDivergence\", optimization = \"minimize\" },\n]",
+    "setup_prompt": "Add an LLM-based refusal judge to my local Heretic setup. The approach comes from kurigohanandkamehameha's PR: responses are classified by a separate model through an OpenAI-compatible API, which helps with thinking models whose refusals appear in the reasoning trace. First check my Heretic version and whether an adapted judge plugin exists; the plugin interface changed between 1.x and 2.x. Configure the endpoint and model from my environment, register the judge scorer with optimization = minimize, and keep KLDivergence minimizing. Do not hardcode any API key. Verify by judging a small sample of responses and comparing the verdicts with KeywordRate before starting a full run."
+  },
+  {
+    "slug": "refusal-direction-tagger",
+    "name": "Refusal-direction scorer/tagger",
+    "type": "scorer",
+    "author": "us_beast_1",
+    "summary": "Detects refusals by comparing initial refusal directions with response hidden states instead of keyword lists.",
+    "description": "An early plugin-branch experiment from the Heretic contributor working on the plugin system. It compares the model's refusal direction with hidden states at the generated response, inspired by activation-steering research. It was tested on a small Gemma 3 model and remained a development branch rather than a published plugin.",
+    "status": "proof-of-concept",
+    "tags": ["scorer", "tagger", "refusal-direction", "activations", "research"],
+    "where_to_find": [
+      { "label": "Plugin system PR", "url": "https://github.com/p-e-w/heretic/pull/53" },
+      { "label": "Referenced steering paper", "url": "https://arxiv.org/abs/2506.00085" }
+    ],
+    "how_to_use": [
+      "Read the plugin PR discussion before attempting this; the scorer/tagger API changed during development.",
+      "If you have a compatible plugin branch, register the detector with optimization = minimize.",
+      "Use a model where the refusal direction can be computed with your available memory.",
+      "Validate its verdicts against printed responses before trusting the score."
+    ],
+    "config_snippet": "scorers = [\n    { plugin = \"./refusal_detector.py:RefusalDetector\", optimization = \"minimize\" },\n]",
+    "setup_prompt": "Try the refusal-direction detector approach from us_beast_1's early Heretic plugin branch in my local setup. It compares initial refusal directions with response hidden states rather than matching keywords. Before changing any config, check whether my Heretic version has the scorer/tagger plugin interface this needs and whether the detector code is available. If it is not, report that clearly instead of inventing a class. If it is, register it with optimization = minimize and keep KLDivergence in the list. Validate on a small sample by printing responses and comparing the detector verdict with an obvious refusal. Do not change model weights or other scorers."
+  },
+  {
+    "slug": "china-censorship-config",
+    "name": "Chinese censorship config fork",
+    "type": "config",
+    "author": "benjamin920101",
+    "summary": "A Heretic fork with refusal markers and prompts aimed at region-specific Chinese censorship rather than general refusals.",
+    "description": "Shared in the community server as a working configuration fork. It changes the refusal markers and dataset setup so the optimization targets censorship behavior specific to Chinese-language prompts. Treat it as a starting config to adapt, not a drop-in plugin.",
+    "status": "community",
+    "tags": ["config", "chinese", "censorship", "keywords", "fork"],
+    "where_to_find": [
+      { "label": "Fork on GitHub", "url": "https://github.com/benjamin920101/heretic-china-censorship" },
+      { "label": "Config file", "url": "https://github.com/benjamin920101/heretic-china-censorship/blob/master/config.default.toml" }
+    ],
+    "how_to_use": [
+      "Copy the fork's config.default.toml into your Heretic working directory as config.toml.",
+      "Review the KeywordRate markers and translate or extend them for your target prompts.",
+      "Point the good and bad prompt datasets at Chinese-language data you actually want to preserve or change.",
+      "Run a short trial set and read printed responses to confirm the markers fire correctly."
+    ],
+    "config_snippet": "[scorer.KeywordRate]\n# Use the markers from the fork's config.default.toml\n\n[modifier.ARA.bad_prompts]\ndataset = \"your-chinese-language-dataset\"\ncolumn = \"text\"",
+    "setup_prompt": "Adapt benjamin920101's Chinese censorship Heretic config in my local installation. Read https://github.com/benjamin920101/heretic-china-censorship/blob/master/config.default.toml and copy its refusal markers and prompt dataset settings into my config.toml, preserving any model-specific settings I already have. Do not blindly overwrite my config: merge the KeywordRate markers and the bad_prompts dataset, and keep my existing scorer list. Then run a short trial and print a few responses to verify the markers match the censorship behavior I care about. Tell me which markers were added so I can review them."
+  },
+  {
+    "slug": "vantablack",
+    "name": "vantablack refusal classifier",
+    "type": "model",
+    "author": "saidutta69",
+    "summary": "A refusal classification model for the BERTClassifier scorer, with separate full and partial refusal labels.",
+    "description": "A text-classification model published for Heretic's BERTClassifier scorer. It uses two refusal labels and text pairs, so it can distinguish a full refusal from a partial one. Community reports found it more conservative than keyword matching on image-generation prompts, which may suit different workflows.",
+    "status": "available",
+    "tags": ["model", "classifier", "bert", "refusals", "bertclassifier"],
+    "where_to_find": [
+      { "label": "Model on Hugging Face", "url": "https://huggingface.co/saidutta69/vantablack" },
+      { "label": "BERTClassifier docs", "url": "https://heretic-project.org/configuration#scorer-bertclassifier" }
+    ],
+    "how_to_use": [
+      "Enable BERTClassifier by adding it to the scorers list; it is not enabled by default.",
+      "Set model to saidutta69/vantablack and match_labels to the two refusal labels.",
+      "Enable use_text_pairs so prompts and responses are classified together.",
+      "Compare its refusal count with KeywordRate before a long run."
+    ],
+    "config_snippet": "scorers = [\n    { plugin = \"heretic.scorers.bert_classifier.BERTClassifier\", optimization = \"minimize\" },\n    { plugin = \"heretic.scorers.kl_divergence.KLDivergence\", optimization = \"minimize\" },\n]\n\n[scorer.BERTClassifier]\nmodel = \"saidutta69/vantablack\"\nmatch_labels = [\"full_refusal\", \"partial_refusal\"]\nuse_text_pairs = true\nmax_length = 512",
+    "setup_prompt": "Configure the saidutta69/vantablack refusal classifier with Heretic's BERTClassifier scorer in my local config.toml. Add { plugin = \"heretic.scorers.bert_classifier.BERTClassifier\", optimization = \"minimize\" } to the scorers list, keep KLDivergence minimizing, and add a [scorer.BERTClassifier] section with model = \"saidutta69/vantablack\", match_labels = [\"full_refusal\", \"partial_refusal\"], use_text_pairs = true, and max_length = 512. BERTClassifier is not enabled by default, so make sure the entry is present rather than only the settings section. Verify by starting Heretic and checking the log line that reports which classifier model was loaded, then compare the first trial's refusal count with KeywordRate."
+  },
+  {
+    "slug": "refusal-classifier-v3",
+    "name": "Refusal Classifier V3",
+    "type": "model",
+    "author": "VINAY-UMRETHE",
+    "summary": "A family of refusal classifiers for BERTClassifier, published in small and large variants.",
+    "description": "Successor models to the V1 and V2 refusal classifiers commonly used with Heretic's BERTClassifier scorer. The author reports a new non-compliant label and stress-test results for both sizes. The large variant is the more accurate of the two according to the author's published tests; treat those numbers as author-reported, not independent benchmarks.",
+    "status": "available",
+    "tags": ["model", "classifier", "bert", "refusals", "v3"],
+    "where_to_find": [
+      { "label": "V3 Small", "url": "https://huggingface.co/VINAY-UMRETHE/Refusal-Classifier-V3-Small" },
+      { "label": "V3 Large", "url": "https://huggingface.co/VINAY-UMRETHE/Refusal-Classifier-V3-Large" },
+      { "label": "V2 model", "url": "https://huggingface.co/VINAY-UMRETHE/Refusal-Classifier-V2" }
+    ],
+    "how_to_use": [
+      "Enable BERTClassifier in the scorers list with optimization = minimize.",
+      "Choose V3-Large for accuracy or V3-Small for lower memory use.",
+      "Set model to the full Hugging Face repository ID and match_labels to the labels named in that model's card.",
+      "Run a small sample and compare verdicts against your previous classifier before switching fully."
+    ],
+    "config_snippet": "scorers = [\n    { plugin = \"heretic.scorers.bert_classifier.BERTClassifier\", optimization = \"minimize\" },\n]\n\n[scorer.BERTClassifier]\nmodel = \"VINAY-UMRETHE/Refusal-Classifier-V3-Large\"\nmatch_labels = [\"full_refusal\", \"partial_refusal\", \"non_compliant\"]\nmax_length = 512",
+    "setup_prompt": "Switch my local Heretic BERTClassifier scorer to VINAY-UMRETHE/Refusal-Classifier-V3-Large. Enable the BERTClassifier scorer with optimization = minimize if it is not already in the scorers list, and set model = \"VINAY-UMRETHE/Refusal-Classifier-V3-Large\" under [scorer.BERTClassifier]. Read the model's Hugging Face card and use its exact label names for match_labels; do not guess labels from memory. Keep max_length = 512 and leave KLDivergence minimizing if it is present. Verify by starting a short Heretic run and confirming the model ID appears in the loaded-classifier log line, then compare the first trial's refusal verdicts with my previous classifier."
+  },
+  {
+    "slug": "mpoa",
+    "name": "MPOA abliteration",
+    "type": "modifier",
+    "author": "p-e-w and contributors",
+    "summary": "Magnitude-preserving orthogonal ablation, available through Heretic's directional abliteration modifier.",
+    "description": "A modifier technique that preserves norm and uses orthogonal directions during abliteration. It began as a community pull request and is now supported by the shipped Abliteration modifier through settings such as row normalization and orthogonalize-direction. Community reports suggest it helps many models, but the maintainer notes that Heretic's parameter search plus MPOA beats the original MPOA parameter strategy.",
+    "status": "available",
+    "tags": ["modifier", "abliteration", "mpoa", "orthogonal", "norm"],
+    "where_to_find": [
+      { "label": "Original PR discussion", "url": "https://github.com/p-e-w/heretic/pull/52" },
+      { "label": "Abliteration source", "url": "https://github.com/p-e-w/heretic/blob/master/src/heretic/modifiers/abliteration.py" }
+    ],
+    "how_to_use": [
+      "Switch the modifiers list to heretic.modifiers.abliteration.Abliteration.",
+      "Enable the MPOA-related flags under [modifier.Abliteration] in config.toml.",
+      "Keep a quality scorer such as KL divergence or a benchmark active so parameter search has a signal.",
+      "Compare against ARA on the same model before choosing."
+    ],
+    "config_snippet": "modifiers = [\n    { plugin = \"heretic.modifiers.abliteration.Abliteration\" },\n]\n\n# MPOA-related flags from the PR discussion:\n# --winsorization-quantile=0.995 --row-normalization=full --orthogonalize-direction",
+    "setup_prompt": "Enable MPOA-style directional abliteration in my local Heretic installation. Check my Heretic version first because the modifier plugin interface changed in 2.x. Set the modifiers list to { plugin = \"heretic.modifiers.abliteration.Abliteration\" } and look up the exact current setting names for winsorization quantile, row normalization, and orthogonalize direction in the shipped config and modifier source; do not guess flag names. Apply the values discussed in PR 52 only if those settings exist in my version, and keep KL divergence or a benchmark scorer active so the optimizer has a quality signal. Verify by starting a short run and confirming the loaded modifier is Abliteration and the MPOA settings appear in the printed config."
+  },
+  {
+    "slug": "soma-modifier",
+    "name": "SOMA modifier",
+    "type": "modifier",
+    "author": "p-e-w and contributors",
+    "summary": "A planned multi-directional modifier intended to sit alongside ARA as a shipped plugin.",
+    "description": "The maintainer described SOMA as a multi-directional transport technique that uses a fixed number of linear paths. It is not released in the current master branch; the plugin interface was reworked specifically so techniques like SOMA can be added. List it here to track intent, not to install today.",
+    "status": "planned",
+    "tags": ["modifier", "soma", "ara", "planned", "transport"],
+    "where_to_find": [
+      { "label": "Plugin system PR", "url": "https://github.com/p-e-w/heretic/pull/53" },
+      { "label": "Modifier interface", "url": "https://github.com/p-e-w/heretic/blob/master/src/heretic/modifier.py" }
+    ],
+    "how_to_use": [
+      "Check the current Heretic release notes before attempting anything; this is not shipped yet.",
+      "If a SOMA plugin appears, register it in the modifiers list in place of ARA.",
+      "Keep your quality scorer active and compare trials against ARA on the same model.",
+      "Do not copy ARA settings into SOMA without checking the new parameter schema."
+    ],
+    "config_snippet": "# Not released yet. When available, it will replace the ARA entry:\nmodifiers = [\n    { plugin = \"heretic.modifiers.soma.SOMA\" },\n]",
+    "setup_prompt": "Check whether the SOMA modifier is available in my installed Heretic version and set it up only if it actually ships. Look in the installed heretic.modifiers package and in the current release notes; do not assume a class named SOMA exists. If it is present, replace the ARA entry in the modifiers list with the exact plugin path from the source, keep my quality scorer active, and read the modifier's own config section before setting any parameters. If it is not present, report that SOMA is still planned and leave my config unchanged. Verify any change by starting a short run and confirming the loaded modifier name."
+  },
+  {
+    "slug": "emotions-config",
+    "name": "Emotion steering config",
+    "type": "config",
+    "author": "p-e-w",
+    "summary": "An official non-default config that steers emotions by minimizing negative and maximizing positive labels.",
+    "description": "Uses two instances of BERTClassifier with a DistilRoBERTa emotion model, plus KL divergence. One instance minimizes negative emotions and another maximizes positive ones, giving a concrete example of how multiple instances of the same scorer can co-optimize opposite directions. It ships in the repository but is not the default.",
+    "status": "available",
+    "tags": ["config", "emotions", "bertclassifier", "steering", "official"],
+    "where_to_find": [
+      { "label": "Config file", "url": "https://github.com/p-e-w/heretic/blob/master/config.emotions.toml" },
+      { "label": "Default config reference", "url": "https://github.com/p-e-w/heretic/blob/master/config.default.toml" }
+    ],
+    "how_to_use": [
+      "Copy config.emotions.toml to config.toml in your Heretic working directory.",
+      "Edit the two emotion label sets to match the classes of the classifier model you use.",
+      "Choose prompts that naturally evoke the emotion you want to change.",
+      "Run a short trial set and inspect responses before committing to a long run."
+    ],
+    "config_snippet": "scorers = [\n    { plugin = \"heretic.scorers.kl_divergence.KLDivergence\", optimization = \"minimize\" },\n    { plugin = \"heretic.scorers.bert_classifier.BERTClassifier\", optimization = \"minimize\", instance_name = \"negative_emotions\" },\n    { plugin = \"heretic.scorers.bert_classifier.BERTClassifier\", optimization = \"maximize\", instance_name = \"positive_emotions\" },\n]",
+    "setup_prompt": "Install the official emotion-steering configuration in my local Heretic working directory. Copy config.emotions.toml to config.toml, but first back up my current config. Confirm the three scorer entries are present: KLDivergence minimizing, BERTClassifier instance negative_emotions minimizing, and BERTClassifier instance positive_emotions maximizing, each with its own [scorer.BERTClassifier_<instance_name>] section. Check that the label lists match the classifier model named in the config, and edit them if my chosen model has different labels. Choose prompts that evoke the target emotion. Verify by starting a short run and confirming all three scorers load with their instance names printed."
+  }
+]

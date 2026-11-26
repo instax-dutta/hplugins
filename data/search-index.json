@@ -1,0 +1,210 @@
+[
+  {
+    "slug": "krea2-drift",
+    "name": "Krea2Drift",
+    "type": "scorer",
+    "author": "zubzer0",
+    "summary": "Measures how far an ablation shifts the text conditioning that Krea 2 feeds to its image model, without generating an image.",
+    "status": "community",
+    "tags": [
+      "scorer",
+      "krea2",
+      "qwen3-vl",
+      "image",
+      "diagnostic"
+    ],
+    "search": "krea2drift zubzer0 measures how far an ablation shifts the text conditioning that krea 2 feeds to its image model, without generating an image. reads the fused text tensor from twelve tapped qwen3-vl layers and reports the mean token cosine drift against the unmodified model, in percent. it is a diagnostic: the shared config uses optimization = none so the score is visible without steering the optimizer. very sensitive to prompt choice, and it needs a krea 2 turbo safetensors checkpoint and roughly 16 gb of vram. scorer community scorer krea2 qwen3-vl image diagnostic"
+  },
+  {
+    "slug": "krea2-good",
+    "name": "Krea2Good",
+    "type": "scorer",
+    "author": "zubzer0",
+    "summary": "Minimizes the p90 drift of good image prompts so an ablation leaves benign Krea 2 conditioning stable.",
+    "status": "community",
+    "tags": [
+      "scorer",
+      "krea2",
+      "qwen3-vl",
+      "image",
+      "minimize"
+    ],
+    "search": "krea2good zubzer0 minimizes the p90 drift of good image prompts so an ablation leaves benign krea 2 conditioning stable. the first half of a paired scorer for image-generating vlms. it takes the largest conditioning drift left after discarding the ten percent of prompts that moved most, then asks the optimizer to minimize it. lower values mean the good prompts kept their original trajectory. use it together with krea2bad and a kl divergence scorer. scorer community scorer krea2 qwen3-vl image minimize"
+  },
+  {
+    "slug": "krea2-bad",
+    "name": "Krea2Bad",
+    "type": "scorer",
+    "author": "zubzer0",
+    "summary": "Maximizes the p90 drift of bad image prompts so abliteration visibly changes how the model handles them.",
+    "status": "community",
+    "tags": [
+      "scorer",
+      "krea2",
+      "qwen3-vl",
+      "image",
+      "maximize"
+    ],
+    "search": "krea2bad zubzer0 maximizes the p90 drift of bad image prompts so abliteration visibly changes how the model handles them. the second half of the paired krea 2 scorer. it keeps the smallest conditioning drift after discarding the ten percent of prompts that moved least, then maximizes it. the author's sign of success is krea2bad p90min rising above krea2good p90max. it correlates with refusal rate on image prompts, so it is useful only alongside a quality scorer such as kl divergence. scorer community scorer krea2 qwen3-vl image maximize"
+  },
+  {
+    "slug": "gibberish-rate",
+    "name": "GibberishRate",
+    "type": "scorer",
+    "author": "randomlygeneratedusername",
+    "summary": "Flags trials whose responses turn into gibberish by counting distinct Unicode scripts.",
+    "status": "proof-of-concept",
+    "tags": [
+      "scorer",
+      "gibberish",
+      "unicode",
+      "ara",
+      "guardrail"
+    ],
+    "search": "gibberishrate randomlygeneratedusername flags trials whose responses turn into gibberish by counting distinct unicode scripts. a community scorer written with coding-model assistance after ara runs produced incoherent outputs. it probes a few prompts per trial and classifies a response as gibberish when it contains more than a configured number of distinct scripts. by default it skips or aborts affected trials rather than adding another optimization objective. no source repository was published; only the config snippet is available. scorer proof-of-concept scorer gibberish unicode ara guardrail"
+  },
+  {
+    "slug": "calibrated-piqa",
+    "name": "Calibrated PIQA",
+    "type": "scorer",
+    "author": "electroglyph",
+    "summary": "A fork of Heretic with a benchmark scorer tuned to PIQA questions that flip between right and wrong.",
+    "status": "community",
+    "tags": [
+      "scorer",
+      "benchmark",
+      "piqa",
+      "gpqa",
+      "fork"
+    ],
+    "search": "calibrated piqa electroglyph a fork of heretic with a benchmark scorer tuned to piqa questions that flip between right and wrong. built on the mainline benchmarkscore idea, this fork repeatedly evaluates a model, keeps questions whose answers flip-flop, and batches those questions to get a higher-signal quality metric. it was used while comparing ablated models against gpqa results. the author reports a modest improvement in signal over plain piqa, not a perfect correlation. scorer community scorer benchmark piqa gpqa fork"
+  },
+  {
+    "slug": "llm-judge",
+    "name": "LLM Judge scorer",
+    "type": "scorer",
+    "author": "kurigohanandkamehameha",
+    "summary": "Uses a separate language model to decide whether a response actually complies, instead of matching refusal keywords.",
+    "status": "proof-of-concept",
+    "tags": [
+      "scorer",
+      "llm-judge",
+      "refusals",
+      "api",
+      "pr"
+    ],
+    "search": "llm judge scorer kurigohanandkamehameha uses a separate language model to decide whether a response actually complies, instead of matching refusal keywords. a pull request that sends responses to a judge model through an openai-compatible api and classifies them. it was motivated by thinking models that refuse inside the reasoning trace and by unusual refusal formats that keyword lists miss. the author found that running the judge as an external api client worked better than loading it inside the heretic process. scorer proof-of-concept scorer llm-judge refusals api pr"
+  },
+  {
+    "slug": "refusal-direction-tagger",
+    "name": "Refusal-direction scorer/tagger",
+    "type": "scorer",
+    "author": "us_beast_1",
+    "summary": "Detects refusals by comparing initial refusal directions with response hidden states instead of keyword lists.",
+    "status": "proof-of-concept",
+    "tags": [
+      "scorer",
+      "tagger",
+      "refusal-direction",
+      "activations",
+      "research"
+    ],
+    "search": "refusal-direction scorer/tagger us_beast_1 detects refusals by comparing initial refusal directions with response hidden states instead of keyword lists. an early plugin-branch experiment from the heretic contributor working on the plugin system. it compares the model's refusal direction with hidden states at the generated response, inspired by activation-steering research. it was tested on a small gemma 3 model and remained a development branch rather than a published plugin. scorer proof-of-concept scorer tagger refusal-direction activations research"
+  },
+  {
+    "slug": "china-censorship-config",
+    "name": "Chinese censorship config fork",
+    "type": "config",
+    "author": "benjamin920101",
+    "summary": "A Heretic fork with refusal markers and prompts aimed at region-specific Chinese censorship rather than general refusals.",
+    "status": "community",
+    "tags": [
+      "config",
+      "chinese",
+      "censorship",
+      "keywords",
+      "fork"
+    ],
+    "search": "chinese censorship config fork benjamin920101 a heretic fork with refusal markers and prompts aimed at region-specific chinese censorship rather than general refusals. shared in the community server as a working configuration fork. it changes the refusal markers and dataset setup so the optimization targets censorship behavior specific to chinese-language prompts. treat it as a starting config to adapt, not a drop-in plugin. config community config chinese censorship keywords fork"
+  },
+  {
+    "slug": "vantablack",
+    "name": "vantablack refusal classifier",
+    "type": "model",
+    "author": "saidutta69",
+    "summary": "A refusal classification model for the BERTClassifier scorer, with separate full and partial refusal labels.",
+    "status": "available",
+    "tags": [
+      "model",
+      "classifier",
+      "bert",
+      "refusals",
+      "bertclassifier"
+    ],
+    "search": "vantablack refusal classifier saidutta69 a refusal classification model for the bertclassifier scorer, with separate full and partial refusal labels. a text-classification model published for heretic's bertclassifier scorer. it uses two refusal labels and text pairs, so it can distinguish a full refusal from a partial one. community reports found it more conservative than keyword matching on image-generation prompts, which may suit different workflows. model available model classifier bert refusals bertclassifier"
+  },
+  {
+    "slug": "refusal-classifier-v3",
+    "name": "Refusal Classifier V3",
+    "type": "model",
+    "author": "VINAY-UMRETHE",
+    "summary": "A family of refusal classifiers for BERTClassifier, published in small and large variants.",
+    "status": "available",
+    "tags": [
+      "model",
+      "classifier",
+      "bert",
+      "refusals",
+      "v3"
+    ],
+    "search": "refusal classifier v3 vinay-umrethe a family of refusal classifiers for bertclassifier, published in small and large variants. successor models to the v1 and v2 refusal classifiers commonly used with heretic's bertclassifier scorer. the author reports a new non-compliant label and stress-test results for both sizes. the large variant is the more accurate of the two according to the author's published tests; treat those numbers as author-reported, not independent benchmarks. model available model classifier bert refusals v3"
+  },
+  {
+    "slug": "mpoa",
+    "name": "MPOA abliteration",
+    "type": "modifier",
+    "author": "p-e-w and contributors",
+    "summary": "Magnitude-preserving orthogonal ablation, available through Heretic's directional abliteration modifier.",
+    "status": "available",
+    "tags": [
+      "modifier",
+      "abliteration",
+      "mpoa",
+      "orthogonal",
+      "norm"
+    ],
+    "search": "mpoa abliteration p-e-w and contributors magnitude-preserving orthogonal ablation, available through heretic's directional abliteration modifier. a modifier technique that preserves norm and uses orthogonal directions during abliteration. it began as a community pull request and is now supported by the shipped abliteration modifier through settings such as row normalization and orthogonalize-direction. community reports suggest it helps many models, but the maintainer notes that heretic's parameter search plus mpoa beats the original mpoa parameter strategy. modifier available modifier abliteration mpoa orthogonal norm"
+  },
+  {
+    "slug": "soma-modifier",
+    "name": "SOMA modifier",
+    "type": "modifier",
+    "author": "p-e-w and contributors",
+    "summary": "A planned multi-directional modifier intended to sit alongside ARA as a shipped plugin.",
+    "status": "planned",
+    "tags": [
+      "modifier",
+      "soma",
+      "ara",
+      "planned",
+      "transport"
+    ],
+    "search": "soma modifier p-e-w and contributors a planned multi-directional modifier intended to sit alongside ara as a shipped plugin. the maintainer described soma as a multi-directional transport technique that uses a fixed number of linear paths. it is not released in the current master branch; the plugin interface was reworked specifically so techniques like soma can be added. list it here to track intent, not to install today. modifier planned modifier soma ara planned transport"
+  },
+  {
+    "slug": "emotions-config",
+    "name": "Emotion steering config",
+    "type": "config",
+    "author": "p-e-w",
+    "summary": "An official non-default config that steers emotions by minimizing negative and maximizing positive labels.",
+    "status": "available",
+    "tags": [
+      "config",
+      "emotions",
+      "bertclassifier",
+      "steering",
+      "official"
+    ],
+    "search": "emotion steering config p-e-w an official non-default config that steers emotions by minimizing negative and maximizing positive labels. uses two instances of bertclassifier with a distilroberta emotion model, plus kl divergence. one instance minimizes negative emotions and another maximizes positive ones, giving a concrete example of how multiple instances of the same scorer can co-optimize opposite directions. it ships in the repository but is not the default. config available config emotions bertclassifier steering official"
+  }
+]

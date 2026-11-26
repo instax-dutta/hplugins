@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-27T01:00:00Z",
+  "title": "Design System: hplugins",
+  "extensions": {
+    "colorMeta": {
+      "selection-cobalt": { "role": "primary", "displayName": "Selection Cobalt", "canonical": "oklch(48% 0.18 264)", "tonalRamp": ["#0b1d4a", "#122a63", "#1D4ED8", "#3d6ae6", "#6488ee", "#8ba6f4", "#b3c4f8", "#dbe2fc"] },
+      "cool-paper": { "role": "neutral", "displayName": "Cool Paper", "canonical": "oklch(95% 0.004 240)", "tonalRamp": ["#14181b", "#2d3438", "#4a565c", "#707d83", "#9aa5aa", "#c6cdd1", "#EDEFF1", "#fbfcfc"] },
+      "plate-white": { "role": "neutral", "displayName": "Plate White", "canonical": "oklch(98% 0.002 240)", "tonalRamp": ["#171b1e", "#353c40", "#566268", "#7d898f", "#a7b1b5", "#d5dade", "#F7F8F8", "#ffffff"] },
+      "graphite-ink": { "role": "neutral", "displayName": "Graphite Ink", "canonical": "oklch(18% 0.01 250)", "tonalRamp": ["#080a0b", "#15191C", "#2a3135", "#414a50", "#5d686e", "#7d888d", "#a7b0b4", "#d3d8da"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Industrial Grotesk", "purpose": "Catalog and dossier titles." },
+      "body": { "displayName": "Reading Grotesk", "purpose": "Descriptions and guides." },
+      "label": { "displayName": "Machine Mono", "purpose": "Indices, counts, config, prompts." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "row-enter", "value": "row-in 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both", "purpose": "One staggered entrance for the catalog list." },
+      { "name": "state-shift", "value": "220ms cubic-bezier(0.2, 0.8, 0.2, 1)", "purpose": "Hover, theme, and button state changes." }
+    ],
+    "breakpoints": [
+      { "name": "plate", "value": "1180px" },
+      { "name": "stack", "value": "760px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Open a dossier or copy a setup prompt.",
+      "html": "<button class=\"ds-btn-primary\">Copy setup prompt</button>",
+      "css": ".ds-btn-primary{background:#1D4ED8;color:#fff;border:1px solid #1D4ED8;border-radius:2px;padding:10px 16px;min-height:46px;font-family:'IBM Plex Mono',monospace;font-size:12px;transition:filter 220ms cubic-bezier(.2,.8,.2,1),transform 220ms cubic-bezier(.2,.8,.2,1)}.ds-btn-primary:hover{filter:brightness(1.08)}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:2px solid #1D4ED8;outline-offset:3px}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Reset controls and secondary actions.",
+      "html": "<button class=\"ds-btn-ghost\">Reset</button>",
+      "css": ".ds-btn-ghost{background:transparent;color:#4A565C;border:1px solid #C6CDD1;border-radius:2px;padding:7px 14px;min-height:38px;font-family:'IBM Plex Mono',monospace;font-size:12px;transition:color 200ms cubic-bezier(.2,.8,.2,1),border-color 200ms cubic-bezier(.2,.8,.2,1)}.ds-btn-ghost:hover{color:#1D4ED8;border-color:#1D4ED8}.ds-btn-ghost:focus-visible{outline:2px solid #1D4ED8;outline-offset:3px}"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Filters the numbered parts index.",
+      "html": "<label class=\"ds-field\"><span>Search the index</span><input type=\"search\" placeholder=\"krea2, gibberish, classifier...\"></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#4A565C}.ds-field input{min-height:38px;padding:7px 10px;background:#F7F8F8;color:#15191C;border:1px solid #C6CDD1;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:13px}.ds-field input:focus{border-color:#1D4ED8;outline:none}.ds-field input:focus-visible{outline:2px solid #1D4ED8;outline-offset:2px}"
+    },
+    {
+      "name": "Type Filter",
+      "kind": "chip",
+      "refersTo": "type-filter",
+      "description": "Spine filter with a tabular count.",
+      "html": "<button class=\"ds-filter\" aria-pressed=\"true\"><span>all parts</span><span>13</span></button>",
+      "css": ".ds-filter{display:flex;justify-content:space-between;gap:8px;width:100%;padding:7px 6px;background:#E3E7E9;color:#1D4ED8;border:0;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:12.5px}.ds-filter:hover{color:#15191C}.ds-filter:focus-visible{outline:2px solid #1D4ED8;outline-offset:2px}"
+    },
+    {
+      "name": "Index Row",
+      "kind": "card",
+      "refersTo": "index-row",
+      "description": "A catalog entry: number, name, one-sentence summary, status.",
+      "html": "<a class=\"ds-row\" href=\"#\"><span class=\"ds-num\">01</span><span><strong>Krea2Drift</strong><span>Measures conditioning drift.</span></span><span class=\"ds-meta\">/SCORER</span></a>",
+      "css": ".ds-row{display:grid;grid-template-columns:48px 1fr auto;gap:18px;padding:20px 8px 20px 0;border-bottom:1px solid #C6CDD1;color:#15191C;text-decoration:none;font-family:Archivo,sans-serif;transition:transform 260ms cubic-bezier(.2,.8,.2,1),background 260ms cubic-bezier(.2,.8,.2,1)}.ds-row:hover{transform:translateX(6px);background:#F7F8F8}.ds-row:focus-visible{outline:2px solid #1D4ED8;outline-offset:3px}.ds-num,.ds-meta{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#4A565C}"
+    },
+    {
+      "name": "Manifest Strip",
+      "kind": "custom",
+      "refersTo": "manifest-line",
+      "description": "Line-numbered setup prompt with a copy action.",
+      "html": "<div class=\"ds-manifest\"><div class=\"ds-line\"><span>01</span><span>Install the plugin.</span></div></div>",
+      "css": ".ds-manifest{border:1px solid #C6CDD1;border-radius:2px;background:#EDEFF1;padding:14px 0;font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.65}.ds-line{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:2px 12px}.ds-line span:first-child{color:#4A565C;user-select:none}"
+    },
+    {
+      "name": "Spine Navigation",
+      "kind": "nav",
+      "refersTo": "spine-nav",
+      "description": "Fixed index rail with totals and filters.",
+      "html": "<nav class=\"ds-spine\"><a href=\"#\">hplugins</a><span>13 catalogued parts</span></nav>",
+      "css": ".ds-spine{display:flex;flex-direction:column;gap:30px;min-height:100vh;padding:34px 24px;background:#F7F8F8;border-right:1px solid #C6CDD1;font-family:Archivo,sans-serif}.ds-spine a{font-size:26px;font-weight:700;letter-spacing:-0.045em;color:#15191C;text-decoration:none}.ds-spine a:focus-visible{outline:2px solid #1D4ED8;outline-offset:3px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Parts Plate",
+    "overview": "A registry treated as an exploded engineering plate rather than a gallery of cards. Every entry is a numbered part on a ruled sheet. A fixed index spine holds the totals; the center carries the parts list; a dossier rail receives the selected part. The page behaves like a document you consult, not a feed you scroll. The atmosphere is cool, dry, and legible. Hairlines do the work that shadows would do elsewhere. Blue appears once, on the active selection and on actions, so it reads as a decision rather than decoration.",
+    "keyCharacteristics": [
+      "Three-column plate with a sticky index spine and a sticky dossier rail",
+      "Numbered list rows with tabular mono indices instead of uniform cards",
+      "One accent, reserved for active state and controls",
+      "Status carried by a rotated square stamp plus text, never color alone"
+    ],
+    "rules": [
+      { "name": "The Single Accent Rule", "body": "Cobalt is used only for active selection, links, and actions. If a region needs emphasis, use weight, scale, or a hairline instead.", "section": "colors" },
+      { "name": "The Stamp Rule", "body": "Status is a rotated square mark plus its text name. The mark is filled only for available; shape and text carry the meaning without relying on hue.", "section": "colors" },
+      { "name": "The Tabular Rule", "body": "Every numeric value uses tabular figures so columns line up without alignment tricks.", "section": "typography" }
+    ],
+    "dos": [
+      "Do keep the index spine and dossier rail present from the first viewport on desktop.",
+      "Do use tabular mono figures for every count and index.",
+      "Do respect prefers-reduced-motion and remove the row entrance entirely."
+    ],
+    "donts": [
+      "Don't introduce a second accent color or a gradient.",
+      "Don't replace list rows with cards or add decorative icons.",
+      "Don't animate layout properties; use transform and opacity only."
+    ]
+  }
+}

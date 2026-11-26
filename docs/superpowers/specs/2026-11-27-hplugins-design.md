@@ -18,12 +18,12 @@ A lightweight public listing of community-made and non-default Heretic plugins, 
 
 1. `data/catalog.json` is authored by hand. It is the only source of truth.
 2. `tools/build.py` validates every entry and emits `data/search-index.json`, a small array of search tokens and display fields. `--check` runs the same validation read-only for CI.
-3. `index.html` is a static shell. `assets/js/app.js` fetches the index, handles `#/` and `#/p/<slug>` hash routes, filters, sorts, renders the list and dossier, persists theme and selection in `localStorage`, and copies prompts through the Clipboard API with a `document.execCommand` fallback.
+3. `index.html` is the static catalog shell. `tools/build.py` derives one `/<slug>/index.html` per entry from that shell, with `site-root` and `entry-slug` meta tags. `assets/js/app.js` fetches the index, routes on the clean path (with `#/p/<slug>` as a fallback), filters, sorts, renders the list or entry article, persists theme in `localStorage`, and copies prompts through the Clipboard API with a `document.execCommand` fallback.
 4. `assets/css/site.css` owns all tokens and layout. Fonts are self-hosted woff2 in `assets/fonts/`.
 
 ## Data flow
 
-Author entry -> `build.py` validates -> generated index -> browser fetch -> route + filter -> list/dossier render -> copy prompt. There is no write path from the browser.
+Author entry -> `build.py` validates -> generated index and entry pages -> browser fetch -> route + filter -> list/article render -> copy prompt. There is no write path from the browser.
 
 ## Error handling
 
@@ -36,7 +36,7 @@ Author entry -> `build.py` validates -> generated index -> browser fetch -> rout
 
 - `unittest` suite covers schema rules, slug uniqueness, prompt presence, link shape, and generated index shape.
 - `tools/build.py --check` runs in CI on every push and pull request.
-- Browser verification covers list, dossier, filters, theme toggle, copy, and mobile width.
+- Browser verification covers list, entry page, filters, theme toggle, copy, clean URLs, and mobile width.
 
 ## Scope boundaries
 

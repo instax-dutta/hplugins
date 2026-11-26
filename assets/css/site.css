@@ -34,7 +34,6 @@
   --display: "Archivo", ui-sans-serif, system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
   --spine: 232px;
-  --dossier: 372px;
   --gutter: clamp(24px, 3.4vw, 56px);
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   color-scheme: light;
@@ -93,7 +92,7 @@ button { font: inherit; cursor: pointer; }
 
 .plate {
   display: grid;
-  grid-template-columns: var(--spine) minmax(0, 1fr) var(--dossier);
+  grid-template-columns: var(--spine) minmax(0, 1fr);
   min-height: 100dvh;
 }
 
@@ -395,108 +394,16 @@ button { font: inherit; cursor: pointer; }
 
 .stamp-mark.is-filled { background: currentColor; }
 
-/* Dossier rail */
+/* Article view */
 
-.dossier {
-  position: sticky;
-  top: 0;
-  align-self: start;
-  height: 100dvh;
-  overflow-y: auto;
-  border-left: 1px solid var(--line);
-  background: var(--surface);
-  padding: 34px 26px 40px;
-}
+.article { max-width: 84ch; }
 
-.dossier-kicker {
-  margin: 0 0 10px;
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-2);
-}
-
-.dossier-name {
-  margin: 0;
-  font-size: 1.7rem;
-  font-weight: 500;
-  line-height: 1.12;
-  letter-spacing: -0.035em;
-}
-
-.dossier-meta {
+.article-meta {
   margin: 10px 0 0;
   font-family: var(--mono);
   font-size: 0.72rem;
   color: var(--ink-2);
 }
-
-.dossier-summary {
-  margin: 20px 0 0;
-  color: var(--ink-2);
-  font-size: 0.88rem;
-  max-width: 40ch;
-}
-
-.dossier-links { list-style: none; margin: 22px 0 0; padding: 0; border-top: 1px solid var(--line); }
-
-.dossier-links li { border-bottom: 1px solid var(--line); }
-
-.dossier-links a {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 0;
-  color: var(--ink);
-  text-decoration: none;
-  font-size: 0.82rem;
-}
-
-.dossier-links a::after {
-  content: "";
-  width: 7px;
-  height: 7px;
-  border-top: 1px solid var(--accent);
-  border-right: 1px solid var(--accent);
-  transform: rotate(45deg);
-  flex: none;
-}
-
-.dossier-links a:hover { color: var(--accent); }
-
-.open-button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  min-height: 46px;
-  margin-top: 24px;
-  padding: 10px 16px;
-  border: 1px solid var(--accent);
-  border-radius: 2px;
-  background: var(--accent);
-  color: var(--accent-ink);
-  font-family: var(--mono);
-  font-size: 0.78rem;
-  text-decoration: none;
-  transition: transform 220ms var(--ease), filter 220ms var(--ease);
-}
-
-.open-button:hover { filter: brightness(1.08); }
-.open-button:active { transform: translateY(1px); }
-
-.open-button::after {
-  content: "";
-  width: 7px;
-  height: 7px;
-  border-top: 1px solid currentColor;
-  border-right: 1px solid currentColor;
-  transform: rotate(45deg);
-}
-
-/* Article view */
 
 .crumb {
   display: inline-block;
@@ -594,21 +501,12 @@ button { font: inherit; cursor: pointer; }
 
 /* Manifest strip */
 
-.manifest-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
 .manifest-lines {
+  margin-top: 12px;
   border: 1px solid var(--line);
   border-radius: 2px;
   background: var(--bg);
   padding: 14px 0;
-  max-height: 46vh;
-  overflow-y: auto;
 }
 
 .manifest-line {
@@ -704,20 +602,6 @@ button { font: inherit; cursor: pointer; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--line); border: 2px solid var(--bg); border-radius: 8px; }
 
-@media (max-width: 1180px) {
-  .plate { grid-template-columns: var(--spine) minmax(0, 1fr); }
-  .dossier {
-    grid-column: 2;
-    position: static;
-    height: auto;
-    max-height: none;
-    border-left: 0;
-    border-top: 1px solid var(--line);
-    padding-top: 28px;
-  }
-  .manifest-lines { max-height: none; }
-}
-
 @media (max-width: 760px) {
   .plate { display: block; }
   .spine {
@@ -744,7 +628,6 @@ button { font: inherit; cursor: pointer; }
   .text-button { justify-self: start; }
   .entry-row { grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 16px 0; }
   .entry-meta { grid-column: 2; flex-direction: row; align-items: center; margin-top: 4px; }
-  .dossier { padding: 24px 18px 40px; }
   .footnote { flex-direction: column; gap: 4px; padding: 14px 18px; }
 }
 

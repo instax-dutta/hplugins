@@ -7,8 +7,8 @@ A lightweight registry of community-made and non-default Heretic plugins, scorer
 GitHub Pages serves static files. There is no server runtime, so the "backend" is a build-time data layer:
 
 - `data/catalog.json` is the only source of truth.
-- `tools/build.py` validates every entry and writes `data/search-index.json`.
-- The browser fetches the small index for the list, and loads the full catalog only when a dossier is opened.
+- `tools/build.py` validates every entry, writes `data/search-index.json`, and generates one static `/<slug>/index.html` page per entry.
+- The browser fetches the small index for the list and loads the full catalog only when an entry page is opened.
 - CI runs the same validator in read-only mode on every push.
 
 Runtime dependencies: none. No framework, no npm, no CDN, no external font request. The two self-hosted fonts total about 42 KB.
@@ -21,7 +21,7 @@ python3 -m unittest discover -s tests -v
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000/`. Hash routes work without server configuration: `#/` is the index, `#/p/<slug>` is an entry dossier.
+Open `http://localhost:8000/`. Entry URLs are clean paths such as `/krea2-drift/`; the older `#/p/<slug>` links still work.
 
 ## Deploy
 
@@ -29,7 +29,7 @@ Push to GitHub, then in repository settings choose Pages, Deploy from a branch, 
 
 ## Add or update an entry
 
-See [docs/contributing.md](docs/contributing.md). After editing `data/catalog.json`, run `python3 tools/build.py` and commit both the catalog and the regenerated index.
+See [docs/contributing.md](docs/contributing.md). After editing `data/catalog.json`, run `python3 tools/build.py` and commit the catalog, the regenerated index, and the regenerated entry pages.
 
 ## Documentation
 

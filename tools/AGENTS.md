@@ -6,13 +6,13 @@ The build-time data layer: validation, index generation, and CI wiring.
 
 ## Ownership
 
-`tools/build.py` is the only writer of `data/search-index.json`. CI runs the same script in check mode.
+`tools/build.py` is the only writer of `data/search-index.json` and of the `/<slug>/index.html` entry pages. CI runs the same script in check mode.
 
 ## Local Contracts
 
 - Python 3 standard library only. No third-party packages, no network calls.
 - `--check` must be read-only and fail with a non-zero exit code on any schema or provenance violation.
-- Default invocation regenerates the search index and prints a short report.
+- Default invocation regenerates the search index and entry pages, removes stale generated pages, and prints a short report.
 - The script is the "backend": GitHub Pages has no server runtime, so all transformation happens before publish.
 
 ## Work Guidance

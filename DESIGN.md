@@ -67,13 +67,13 @@ components:
 
 **Creative North Star: "The Parts Plate"**
 
-A registry treated as an exploded engineering plate rather than a gallery of cards. Every entry is a numbered part on a ruled sheet. A fixed index spine holds the totals; the center carries the parts list; a dossier rail receives the selected part. The page behaves like a document you consult, not a feed you scroll.
+A registry treated as an exploded engineering plate rather than a gallery of cards. Every entry is a numbered part on a ruled sheet. A fixed index spine holds the totals; the main column carries the parts list and, on an entry page, the full sheet. The page behaves like a document you consult, not a feed you scroll.
 
 The atmosphere is cool, dry, and legible. Hairlines do the work that shadows would do elsewhere. Blue appears once, on the active selection and on actions, so it reads as a decision rather than decoration. Both themes share the same structure: cool paper by day, night plate after dark.
 
 **Key Characteristics:**
 
-- Three-column plate with a sticky index spine and a sticky dossier rail
+- Two-column plate with a sticky index spine and a wide reading column
 - Numbered list rows with tabular mono indices instead of uniform cards
 - One accent, reserved for active state and controls
 - Status carried by a rotated square stamp plus text, never color alone
@@ -87,7 +87,7 @@ One accent on a neutral plate. Dark mode swaps the neutral ramp and lightens the
 
 ### Neutral
 - **Cool Paper** (#EDEFF1): Page ground in light mode.
-- **Plate White** (#F7F8F8): Spine and dossier surfaces.
+- **Plate White** (#F7F8F8): Spine surface and input backgrounds.
 - **Graphite Ink** (#15191C): Headings and body copy.
 - **Machine Grey** (#4A565C): Secondary copy and labels.
 - **Hairline Grey** (#C6CDD1): Rules and input borders.
@@ -109,7 +109,7 @@ One accent on a neutral plate. Dark mode swaps the neutral ramp and lightens the
 **Character:** Archivo has the stolid, industrial proportions of a parts catalogue. IBM Plex Mono supplies measurement and evidence: indices, counts, config fragments, and the setup prompt.
 
 ### Hierarchy
-- **Display** (500, clamp(2.4rem, 4.6vw, 4.1rem), 1.02): Catalog and dossier titles, tracking -0.04em.
+- **Display** (500, clamp(2.4rem, 4.6vw, 4.1rem), 1.02): Catalog and entry titles, tracking -0.04em.
 - **Title** (500, 1.32rem, 1.2): Entry names in the list.
 - **Body** (400, 0.98rem, 1.6): Copy, capped near 65ch.
 - **Label** (400, 0.72rem, 1.5, uppercase): Mono labels, counts, status, metadata.
@@ -119,7 +119,7 @@ One accent on a neutral plate. Dark mode swaps the neutral ramp and lightens the
 
 ## Layout
 
-Three columns at desktop: 232px spine, fluid list, 372px dossier. Both side rails are sticky at 100dvh. The list is a single column of ruled rows; there is no card grid. Below 1180px the dossier moves under the list; below 760px the spine becomes a top bar and its type filters wrap into a chip row. Gutter scales from 24px to 56px. Section spacing favors more room above a heading than below it.
+Two columns at desktop: 232px spine and a fluid reading column. The spine is sticky at 100dvh; the main column holds either the catalog list or an entry article capped near 84ch. The list is a single column of ruled rows; there is no card grid and no right rail. Below 760px the spine becomes a top bar and its type filters wrap into a chip row. Gutter scales from 24px to 56px. Section spacing favors more room above a heading than below it.
 
 ## Elevation & Depth
 
@@ -159,7 +159,7 @@ The signature component: a bordered mono block with line numbers, a scroll cap o
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep the index spine and dossier rail present from the first viewport on desktop.
+- **Do** keep the index spine present from the first viewport on desktop and let the list use the full remaining width.
 - **Do** use tabular mono figures for every count and index.
 - **Do** respect `prefers-reduced-motion` and remove the row entrance entirely.
 

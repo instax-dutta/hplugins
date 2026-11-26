@@ -87,5 +87,20 @@ class IndexTests(unittest.TestCase):
         self.assertEqual(REAL, snapshot)
 
 
+class EntryPageTests(unittest.TestCase):
+    def test_generated_pages_match_shell(self):
+        pages = build.build_entry_pages(REAL)
+        for slug, page in pages.items():
+            target = ROOT / slug / "index.html"
+            self.assertTrue(target.is_file(), f"missing generated page for {slug}")
+            self.assertEqual(target.read_text(encoding="utf-8"), page, f"stale page for {slug}")
+
+    def test_generated_page_has_root_and_slug_meta(self):
+        page = build.build_entry_pages(REAL)["krea2-drift"]
+        self.assertIn('name="entry-slug" content="krea2-drift"', page)
+        self.assertIn('name="site-root" content="../"', page)
+        self.assertIn('src="../assets/js/app.js', page)
+
+
 if __name__ == "__main__":
     unittest.main()

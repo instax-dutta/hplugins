@@ -4,24 +4,103 @@
   "title": "Design System: hplugins",
   "extensions": {
     "colorMeta": {
-      "selection-cobalt": { "role": "primary", "displayName": "Selection Cobalt", "canonical": "oklch(48% 0.18 264)", "tonalRamp": ["#0b1d4a", "#122a63", "#1D4ED8", "#3d6ae6", "#6488ee", "#8ba6f4", "#b3c4f8", "#dbe2fc"] },
-      "cool-paper": { "role": "neutral", "displayName": "Cool Paper", "canonical": "oklch(95% 0.004 240)", "tonalRamp": ["#14181b", "#2d3438", "#4a565c", "#707d83", "#9aa5aa", "#c6cdd1", "#EDEFF1", "#fbfcfc"] },
-      "plate-white": { "role": "neutral", "displayName": "Plate White", "canonical": "oklch(98% 0.002 240)", "tonalRamp": ["#171b1e", "#353c40", "#566268", "#7d898f", "#a7b1b5", "#d5dade", "#F7F8F8", "#ffffff"] },
-      "graphite-ink": { "role": "neutral", "displayName": "Graphite Ink", "canonical": "oklch(18% 0.01 250)", "tonalRamp": ["#080a0b", "#15191C", "#2a3135", "#414a50", "#5d686e", "#7d888d", "#a7b0b4", "#d3d8da"] }
+      "selection-cobalt": {
+        "role": "primary",
+        "displayName": "Selection Cobalt",
+        "canonical": "oklch(48% 0.18 264)",
+        "tonalRamp": [
+          "#0b1d4a",
+          "#122a63",
+          "#1D4ED8",
+          "#3d6ae6",
+          "#6488ee",
+          "#8ba6f4",
+          "#b3c4f8",
+          "#dbe2fc"
+        ]
+      },
+      "cool-paper": {
+        "role": "neutral",
+        "displayName": "Cool Paper",
+        "canonical": "oklch(95% 0.004 240)",
+        "tonalRamp": [
+          "#14181b",
+          "#2d3438",
+          "#4a565c",
+          "#707d83",
+          "#9aa5aa",
+          "#c6cdd1",
+          "#EDEFF1",
+          "#fbfcfc"
+        ]
+      },
+      "plate-white": {
+        "role": "neutral",
+        "displayName": "Plate White",
+        "canonical": "oklch(98% 0.002 240)",
+        "tonalRamp": [
+          "#171b1e",
+          "#353c40",
+          "#566268",
+          "#7d898f",
+          "#a7b1b5",
+          "#d5dade",
+          "#F7F8F8",
+          "#ffffff"
+        ]
+      },
+      "graphite-ink": {
+        "role": "neutral",
+        "displayName": "Graphite Ink",
+        "canonical": "oklch(18% 0.01 250)",
+        "tonalRamp": [
+          "#080a0b",
+          "#15191C",
+          "#2a3135",
+          "#414a50",
+          "#5d686e",
+          "#7d888d",
+          "#a7b0b4",
+          "#d3d8da"
+        ]
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Industrial Grotesk", "purpose": "Catalog and dossier titles." },
-      "body": { "displayName": "Reading Grotesk", "purpose": "Descriptions and guides." },
-      "label": { "displayName": "Machine Mono", "purpose": "Indices, counts, config, prompts." }
+      "display": {
+        "displayName": "Industrial Grotesk",
+        "purpose": "Catalog and entry titles."
+      },
+      "body": {
+        "displayName": "Reading Grotesk",
+        "purpose": "Descriptions and guides."
+      },
+      "label": {
+        "displayName": "Machine Mono",
+        "purpose": "Indices, counts, config, prompts."
+      }
     },
     "shadows": [],
     "motion": [
-      { "name": "row-enter", "value": "row-in 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both", "purpose": "One staggered entrance for the catalog list." },
-      { "name": "state-shift", "value": "220ms cubic-bezier(0.2, 0.8, 0.2, 1)", "purpose": "Hover, theme, and button state changes." }
+      {
+        "name": "row-enter",
+        "value": "row-in 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both",
+        "purpose": "One staggered entrance for the catalog list."
+      },
+      {
+        "name": "state-shift",
+        "value": "220ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "purpose": "Hover, theme, and button state changes."
+      }
     ],
     "breakpoints": [
-      { "name": "plate", "value": "1180px" },
-      { "name": "stack", "value": "760px" }
+      {
+        "name": "plate",
+        "value": "1180px"
+      },
+      {
+        "name": "stack",
+        "value": "760px"
+      }
     ]
   },
   "components": [
@@ -29,7 +108,7 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Open a dossier or copy a setup prompt.",
+      "description": "Copy a setup prompt or continue to an entry page.",
       "html": "<button class=\"ds-btn-primary\">Copy setup prompt</button>",
       "css": ".ds-btn-primary{background:#1D4ED8;color:#fff;border:1px solid #1D4ED8;border-radius:2px;padding:10px 16px;min-height:46px;font-family:'IBM Plex Mono',monospace;font-size:12px;transition:filter 220ms cubic-bezier(.2,.8,.2,1),transform 220ms cubic-bezier(.2,.8,.2,1)}.ds-btn-primary:hover{filter:brightness(1.08)}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:2px solid #1D4ED8;outline-offset:3px}"
     },
@@ -84,20 +163,32 @@
   ],
   "narrative": {
     "northStar": "The Parts Plate",
-    "overview": "A registry treated as an exploded engineering plate rather than a gallery of cards. Every entry is a numbered part on a ruled sheet. A fixed index spine holds the totals; the center carries the parts list; a dossier rail receives the selected part. The page behaves like a document you consult, not a feed you scroll. The atmosphere is cool, dry, and legible. Hairlines do the work that shadows would do elsewhere. Blue appears once, on the active selection and on actions, so it reads as a decision rather than decoration.",
+    "overview": "A registry treated as an exploded engineering plate rather than a gallery of cards. Every entry is a numbered part on a ruled sheet. A fixed index spine holds the totals; the center carries the parts list; an entry page carries the full sheet. The page behaves like a document you consult, not a feed you scroll. The atmosphere is cool, dry, and legible. Hairlines do the work that shadows would do elsewhere. Blue appears once, on the active selection and on actions, so it reads as a decision rather than decoration.",
     "keyCharacteristics": [
-      "Three-column plate with a sticky index spine and a sticky dossier rail",
+      "Two-column plate with a sticky index spine and a wide reading column",
       "Numbered list rows with tabular mono indices instead of uniform cards",
       "One accent, reserved for active state and controls",
       "Status carried by a rotated square stamp plus text, never color alone"
     ],
     "rules": [
-      { "name": "The Single Accent Rule", "body": "Cobalt is used only for active selection, links, and actions. If a region needs emphasis, use weight, scale, or a hairline instead.", "section": "colors" },
-      { "name": "The Stamp Rule", "body": "Status is a rotated square mark plus its text name. The mark is filled only for available; shape and text carry the meaning without relying on hue.", "section": "colors" },
-      { "name": "The Tabular Rule", "body": "Every numeric value uses tabular figures so columns line up without alignment tricks.", "section": "typography" }
+      {
+        "name": "The Single Accent Rule",
+        "body": "Cobalt is used only for active selection, links, and actions. If a region needs emphasis, use weight, scale, or a hairline instead.",
+        "section": "colors"
+      },
+      {
+        "name": "The Stamp Rule",
+        "body": "Status is a rotated square mark plus its text name. The mark is filled only for available; shape and text carry the meaning without relying on hue.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Rule",
+        "body": "Every numeric value uses tabular figures so columns line up without alignment tricks.",
+        "section": "typography"
+      }
     ],
     "dos": [
-      "Do keep the index spine and dossier rail present from the first viewport on desktop.",
+      "Do keep the index spine present from the first viewport on desktop and let the list use the full remaining width.",
       "Do use tabular mono figures for every count and index.",
       "Do respect prefers-reduced-motion and remove the row entrance entirely."
     ],

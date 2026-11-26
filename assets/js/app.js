@@ -2,10 +2,13 @@
 (function () {
   "use strict";
 
-  var INDEX_URL = "data/search-index.json";
-  var CATALOG_URL = "data/catalog.json";
+  var rootMeta = document.querySelector('meta[name="site-root"]');
+  var slugMeta = document.querySelector('meta[name="entry-slug"]');
+  var SITE_ROOT = rootMeta ? rootMeta.getAttribute("content") : "";
+  var ENTRY_SLUG = slugMeta ? slugMeta.getAttribute("content") : null;
+  var INDEX_URL = SITE_ROOT + "data/search-index.json";
+  var CATALOG_URL = SITE_ROOT + "data/catalog.json";
   var view = document.getElementById("view");
-  var dossierView = document.getElementById("dossier-view");
   var typeNav = document.getElementById("type-nav");
   var total = document.getElementById("entry-total");
   var themeButton = document.getElementById("theme-button");
@@ -16,9 +19,13 @@
     filter: "all",
     query: "",
     sort: "index",
-    previewSlug: null,
     catalogPromise: null
   };
+
+  var requestedType = new URLSearchParams(window.location.search).get("type");
+  if (["scorer", "modifier", "config", "model", "fork", "tool"].indexOf(requestedType) !== -1) {
+    state.filter = requestedType;
+  }
 
   function esc(value) {
     return String(value == null ? "" : value)
@@ -60,8 +67,12 @@
   }
 
   function parseRoute() {
-    var hash = window.location.hash || "#/";
-    var match = hash.match(/^#\/p\/([a-z0-9-]+)$/);
+    if (ENTRY_SLUG) return { kind: "detail", slug: ENTRY_SLUG };
+    var segments = window.location.pathname.split("/").filter(Boolean);
+    if (segments.length === 1 && state.index.some(function (item) { return item.slug === segments[0]; })) {
+      return { kind: "detail", slug: segments[0] };
+    }
+    var match = (window.location.hash || "").match(/^#\/p\/([a-z0-9-]+)$/);
     return match ? { kind: "detail", slug: match[1] } : { kind: "list" };
   }
 
@@ -87,8 +98,11 @@
   function setFilter(type) {
     state.filter = type;
     renderTypeNav();
-    if (parseRoute().kind !== "list") window.location.hash = "#/";
-    else updateList();
+    if (parseRoute().kind !== "list") {
+      window.location.href = (SITE_ROOT || "/") + "?type=" + encodeURIComponent(type);
+    } else {
+      updateList();
+    }
   }
 
   function updateList() {
@@ -111,57 +125,14 @@
     }
 
     list.innerHTML = items.map(function (item, i) {
-      return '<li><a class="entry-row" style="--i:' + Math.min(i, 12) + '" href="#/p/' + esc(item.slug) +
-        '" data-slug="' + esc(item.slug) + '">' +
+      return '<li><a class="entry-row" style="--i:' + Math.min(i, 12) + '" href="' +
+        SITE_ROOT + esc(item.slug) + '/">' +
         '<span class="entry-index">' + pad(i + 1) + '</span>' +
         '<span class="entry-body"><span class="entry-name">' + esc(item.name) + '</span>' +
         '<span class="entry-summary">' + esc(item.summary) + '</span></span>' +
         '<span class="entry-meta"><span>/' + esc(item.type) + '</span>' + stamp(item.status) + "</span></a></li>";
     }).join("");
 
-    if (state.previewSlug && !items.some(function (item) { return item.slug === state.previewSlug; })) {
-      state.previewSlug = null;
-    }
-    if (state.previewSlug) previewDossier(state.previewSlug);
-    else renderEmptyDossier();
-  }
-
-  function renderEmptyDossier() {
-    dossierView.innerHTML =
-      '<p class="dossier-kicker">Dossier</p>' +
-      '<h2 class="dossier-name">Nothing selected yet.</h2>' +
-      '<p class="dossier-summary">Hover a row to preview it here. Open a part to read its guide and copy its setup prompt.</p>';
-  }
-
-  function previewDossier(slug) {
-    var item = state.index.find(function (entry) { return entry.slug === slug; });
-    if (!item) return;
-    state.previewSlug = slug;
-    var head =
-      '<p class="dossier-kicker">Selected part</p>' +
-      '<h2 class="dossier-name">' + esc(item.name) + "</h2>" +
-      '<p class="dossier-meta">/' + esc(item.type) + " - " + esc(item.author) + " - " + esc(item.status) + "</p>" +
-      '<p class="dossier-summary">' + esc(item.summary) + "</p>";
-    dossierView.innerHTML = head + '<p class="dossier-kicker">Loading setup prompt...</p>';
-
-    getCatalog().then(function (catalog) {
-      if (state.previewSlug !== slug || parseRoute().kind !== "list") return;
-      var entry = catalog.find(function (record) { return record.slug === slug; });
-      if (!entry) return;
-      dossierView.innerHTML = head +
-        '<ul class="dossier-links">' + entry.where_to_find.map(function (link) {
-          return '<li><a href="' + safeUrl(link.url) + '" rel="noopener noreferrer">' +
-            esc(link.label) + "</a></li>";
-        }).join("") + "</ul>" +
-        '<a class="open-button" href="#/p/' + esc(slug) + '">Read the full guide</a>' +
-        manifest(entry);
-      bindCopy(entry);
-    }).catch(function () {
-      if (state.previewSlug === slug && parseRoute().kind === "list") {
-        dossierView.innerHTML = head + '<p class="manifest-note">The setup prompt is unavailable right now. ' +
-          '<a href="#/p/' + esc(slug) + '">Open the dossier</a> to retry.</p>';
-      }
-    });
   }
 
   function renderCatalog() {
@@ -177,7 +148,7 @@
       '<select id="sort-select"><option value="index">Index</option><option value="name">Name</option>' +
       '<option value="author">Author</option></select></div>' +
       '<button class="text-button" type="button" id="reset-button">Reset</button></div>' +
-      '<div class="results-line"><span id="result-count"></span><span>select a part to see its setup prompt</span></div>' +
+      '<div class="results-line"><span id="result-count"></span><span>open a part for its guide and setup prompt</span></div>' +
       '<ol class="entry-list" id="entry-list"></ol>';
 
     var search = document.getElementById("search-input");
@@ -194,17 +165,6 @@
       renderTypeNav(); updateList();
     });
 
-    var list = document.getElementById("entry-list");
-    list.addEventListener("mouseover", function (event) {
-      var row = event.target.closest(".entry-row");
-      if (row && row.dataset.slug !== state.previewSlug) previewDossier(row.dataset.slug);
-    });
-    list.addEventListener("focusin", function (event) {
-      var row = event.target.closest(".entry-row");
-      if (row) previewDossier(row.dataset.slug);
-    });
-
-    state.previewSlug = null;
     updateList();
   }
 
@@ -228,16 +188,16 @@
 
   function manifest(entry) {
     var lines = wrapText(entry.setup_prompt, 42);
-    return '<div class="manifest-head"><p class="dossier-kicker">Setup prompt</p>' +
-      '<span class="dossier-meta">' + pad(lines.length) + ' lines</span></div>' +
+    return '<section class="article-section"><h2 class="section-title">Setup prompt</h2>' +
+      '<p class="article-meta">' + pad(lines.length) + ' lines - paste into a coding model in your Heretic checkout</p>' +
       '<div class="manifest-lines">' + lines.map(function (line, i) {
         return '<div class="manifest-line"><span class="line-no">' + pad(i + 1) +
           '</span><span class="line-text">' + esc(line || " ") + "</span></div>";
       }).join("") + "</div>" +
       '<button class="copy-button" type="button" id="copy-prompt"><span>Copy setup prompt</span>' +
       '<span aria-hidden="true">[ ]</span></button>' +
-      '<p class="manifest-note">Paste this into a coding model in the Heretic checkout you use. ' +
-      'It names the files, config keys, and a check that proves the setup loaded.</p>';
+      '<p class="manifest-note">It names the files, config keys, and a check that proves the setup loaded.</p>' +
+      "</section>";
   }
 
   function bindCopy(entry) {
@@ -290,7 +250,6 @@
     if (!entry) {
       view.innerHTML = '<div class="notice"><h2>Entry not found</h2><p>No catalog entry has the slug ' +
         esc(slug) + '.</p><p><a href="#/">Back to the index</a></p></div>';
-      dossierView.innerHTML = "";
       return;
     }
 
@@ -301,9 +260,10 @@
     var next = position !== -1 && position < order.length - 1 ? order[position + 1] : null;
 
     view.innerHTML =
-      '<a class="crumb" href="#/">&larr; back to index</a>' +
+      '<div class="article">' +
+      '<a class="crumb" href="' + (SITE_ROOT || "/") + '">&larr; back to index</a>' +
       '<h1 class="article-title">' + esc(entry.name) + "</h1>" +
-      '<p class="dossier-meta">/' + esc(entry.type) + " - by " + esc(entry.author) + " - " + esc(entry.status) + "</p>" +
+      '<p class="article-meta">/' + esc(entry.type) + " - by " + esc(entry.author) + " - " + esc(entry.status) + "</p>" +
       '<p class="article-lead">' + esc(entry.summary) + "</p>" +
       '<section class="article-section"><h2 class="section-title">What it does</h2>' +
       '<p class="prose">' + esc(entry.description) + "</p></section>" +
@@ -317,26 +277,24 @@
       }).join("") + "</ol></section>" +
       (entry.config_snippet ? '<section class="article-section"><h2 class="section-title">Config fragment</h2>' +
         '<pre class="code-block">' + esc(entry.config_snippet) + "</pre></section>" : "") +
+      manifest(entry) +
       '<nav class="pair-nav">' +
-      (previous ? '<a href="#/p/' + esc(previous) + '">Previous part</a>' : "<span></span>") +
-      (next ? '<a href="#/p/' + esc(next) + '">Next part</a>' : "<span></span>") + "</nav>";
+      (previous ? '<a href="' + SITE_ROOT + esc(previous) + '/">Previous part</a>' : "<span></span>") +
+      (next ? '<a href="' + SITE_ROOT + esc(next) + '/">Next part</a>' : "<span></span>") +
+      "</nav></div>";
 
-    dossierView.innerHTML = manifest(entry);
     bindCopy(entry);
   }
 
   function showError(message) {
     view.innerHTML = '<div class="notice"><h2>The index could not be read</h2><p>' + esc(message) +
       '</p><button class="text-button" type="button" id="retry-button">Retry</button></div>';
-    dossierView.innerHTML = '<p class="dossier-kicker">Dossier</p><p class="dossier-summary">' +
-      "The selected part is unavailable until the index loads.</p>";
     document.getElementById("retry-button").addEventListener("click", function () { boot(); });
   }
 
   function showSkeleton() {
     view.innerHTML = '<div class="skeleton-line"></div><div class="skeleton-line"></div>' +
       '<div class="skeleton-line"></div>';
-    dossierView.innerHTML = '<p class="dossier-kicker">Dossier</p>';
   }
 
   function route() {

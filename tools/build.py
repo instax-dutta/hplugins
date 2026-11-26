@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import sys
 from pathlib import Path
 
@@ -128,6 +129,40 @@ def load_catalog() -> object:
         return json.load(handle)
 
 
+def build_entry_pages(entries: list[dict]) -> dict[str, str]:
+    """Derive one static page per slug from the root shell."""
+    shell = (ROOT / "index.html").read_text(encoding="utf-8")
+    pages = {}
+    for entry in entries:
+        page = shell.replace('href="assets/', 'href="../assets/')
+        page = page.replace('src="assets/', 'src="../assets/')
+        page = page.replace('href="HERETIC_PLUGINS.md"', 'href="../HERETIC_PLUGINS.md"')
+        meta = (
+            '  <meta name="site-root" content="../">\n'
+            f'  <meta name="entry-slug" content="{entry["slug"]}">\n'
+        )
+        page = page.replace(
+            '  <meta name="color-scheme" content="light dark">',
+            meta + '  <meta name="color-scheme" content="light dark">',
+        )
+        pages[entry["slug"]] = page
+    return pages
+
+
+def stale_entry_dirs(slugs: set[str]) -> list[Path]:
+    """Find generated entry pages whose slug is no longer in the catalog."""
+    stale = []
+    for directory in ROOT.iterdir():
+        page = directory / "index.html"
+        if not directory.is_dir() or not page.is_file():
+            continue
+        text = page.read_text(encoding="utf-8", errors="replace")
+        match = re.search(r'name="entry-slug" content="([^"]+)"', text)
+        if match and match.group(1) not in slugs:
+            stale.append(directory)
+    return stale
+
+
 def main() -> int:
     check_only = "--check" in sys.argv[1:]
     try:
@@ -144,19 +179,40 @@ def main() -> int:
         return 1
 
     generated = json.dumps(build_index(entries), ensure_ascii=False, indent=2) + "\n"
+    pages = build_entry_pages(entries)
+    slugs = set(pages)
+
     if check_only:
         if not INDEX.exists() or INDEX.read_text(encoding="utf-8") != generated:
             print("INVALID search index is missing or stale; run tools/build.py", file=sys.stderr)
             return 1
+        for slug, page in pages.items():
+            target = ROOT / slug / "index.html"
+            if not target.is_file() or target.read_text(encoding="utf-8") != page:
+                print(f"INVALID entry page for {slug} is missing or stale; run tools/build.py", file=sys.stderr)
+                return 1
+        stale = stale_entry_dirs(slugs)
+        if stale:
+            print("INVALID stale generated pages: " + ", ".join(p.name for p in stale), file=sys.stderr)
+            return 1
     else:
         INDEX.write_text(generated, encoding="utf-8")
+        for slug, page in pages.items():
+            target = ROOT / slug / "index.html"
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(page, encoding="utf-8")
+        for directory in stale_entry_dirs(slugs):
+            shutil.rmtree(directory)
 
     counts: dict[str, int] = {}
     for entry in entries:
         counts[entry["type"]] = counts.get(entry["type"], 0) + 1
     summary = ", ".join(f"{count} {kind}" for kind, count in sorted(counts.items()))
     mode = "checked" if check_only else "built"
-    print(f"{mode}: {len(entries)} entries ({summary}), index {len(generated.encode())} bytes")
+    print(
+        f"{mode}: {len(entries)} entries ({summary}), index {len(generated.encode())} bytes, "
+        f"{len(pages)} entry pages"
+    )
     return 0
 
 

@@ -6,13 +6,13 @@ Chosen direction: **exploded parts manifest**, seed `28f5ae27`, candidate 7 of t
 
 ## Direction contract
 
-THESIS: A plugin registry as an exploded service plate, not a card gallery. The list is a numbered parts index with leader lines into a persistent dossier; the setup prompt is the part that gets lifted out and carried away.
+THESIS: A plugin registry as an exploded service plate, not a card gallery. The list is a numbered parts index; opening a part shows the full sheet, where the setup prompt is the piece that gets lifted out and carried away.
 
 OWN-WORLD: Cool grey paper and ink, hairline rules, registration crosses, tabular mono numerics, a sticky index spine, and one cobalt accent reserved for the active selection. Status is a stamped mark plus text, never color alone.
 
-STORY: The visitor sees a finite, numbered inventory. Filtering narrows the plate; selecting a row rethreads the callout into the dossier, where source links and the manifest strip answer "where do I get it" and "how do I install it".
+STORY: The visitor sees a finite, numbered inventory. Filtering narrows the plate; opening a row leads to its own page, where source links and the manifest strip answer "where do I get it" and "how do I install it".
 
-FIRST VIEWPORT: A fixed left spine holds the wordmark, entry count, and type counts. To its right, immediately visible, a single sign-band holds search and type filters. Below it, numbered entries begin above the fold. On desktop a right dossier panel is present from the first frame with the selected entry's manifest strip and its copy action. No marketing hero.
+FIRST VIEWPORT: A fixed left spine holds the wordmark, entry count, and type counts. The main column opens with the title, a single sign-band for search and order, then numbered entries above the fold. No right rail. Each entry page carries the setup prompt as a normal article section with its copy action.
 
 FORM: Exploded-view technical plate (candidate 7). The "manifest strip" is the signature interaction: a line-numbered monospace prompt block whose copy action gives visible confirmation.
 

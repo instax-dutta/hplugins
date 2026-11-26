@@ -67,7 +67,7 @@ jobs:
           fi
 
           files=$(gh api "repos/$REPO/pulls/$pr/files" --paginate --jq '.[].filename')
-          manual=$(echo "$files" | grep -vE '^(data/|docs/|HERETIC_PLUGINS\.md$|README\.md$|DESIGN\.md$|PRODUCT\.md$|AGENTS\.md$)' || true)
+          manual=$(echo "$files" | grep -vE '^(data/|docs/|[a-z0-9-]+/index\.html$|HERETIC_PLUGINS\.md$|README\.md$|DESIGN\.md$|PRODUCT\.md$|AGENTS\.md$)' || true)
           if [ -n "$manual" ]; then
             echo "Manual review required for files outside catalog and docs:"
             echo "$manual"

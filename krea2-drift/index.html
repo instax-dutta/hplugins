@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>hplugins - Community-built Heretic plugins and scorers</title>
+  <meta name="description" content="A curated index of community-built Heretic scorers, modifiers, configs, and models. Each entry includes source links, a usage guide, and a copy-paste setup prompt.">
+  <meta name="site-root" content="../">
+  <meta name="entry-slug" content="krea2-drift">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#EDEFF1">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="../assets/fonts/archivo-400-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../assets/css/site.css?v=3">
+  <script>
+    // Applied before paint so the plate never flashes the wrong theme.
+    (function () {
+      try {
+        var saved = localStorage.getItem('hplugins-theme');
+        var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (dark) document.documentElement.dataset.theme = 'dark';
+      } catch (e) {}
+    })();
+  </script>
+  <script src="../assets/js/app.js?v=3" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="plate">
+    <aside class="spine" aria-label="Registry index">
+      <div class="spine-head">
+        <a class="wordmark" href="#/" aria-label="hplugins home">
+          h<span>plugins</span><span class="wordmark-dot" aria-hidden="true"></span>
+        </a>
+        <p class="spine-sub">Community-built extensions<br>for Heretic.</p>
+      </div>
+
+      <div class="spine-block">
+        <p class="spine-label">Index</p>
+        <p class="spine-count" id="entry-total">---</p>
+        <p class="spine-unit">catalogued parts</p>
+      </div>
+
+      <nav class="spine-nav" id="type-nav" aria-label="Filter by type"></nav>
+
+      <div class="spine-foot">
+        <button class="theme-button" id="theme-button" type="button" aria-label="Switch color theme">
+          <span class="theme-glyph" aria-hidden="true"></span>
+          <span id="theme-label">Theme</span>
+        </button>
+        <a class="spine-link" href="https://github.com/instax-dutta/hplugins/blob/main/docs/contributing.md" target="_blank" rel="noopener noreferrer">Contribute a part</a>
+      </div>
+    </aside>
+
+    <main class="main" id="main">
+      <div id="view" aria-live="polite"></div>
+    </main>
+  </div>
+
+  <footer class="footnote">
+    <span>hplugins</span>
+    <span>Community work, clearly sourced and easy to install.</span>
+  </footer>
+
+  <noscript>
+    <p class="noscript">This registry needs JavaScript to read the catalog. The full source inventory is in <a href="../HERETIC_PLUGINS.md">HERETIC_PLUGINS.md</a>.</p>
+  </noscript>
+</body>
+</html>

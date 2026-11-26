@@ -145,7 +145,7 @@
           return '<li><a href="' + safeUrl(link.url) + '" rel="noopener noreferrer">' +
             esc(link.label) + "</a></li>";
         }).join("") + "</ul>" +
-        '<a class="open-button" href="#/p/' + esc(slug) + '">Open dossier</a>' +
+        '<a class="open-button" href="#/p/' + esc(slug) + '">Read the full guide</a>' +
         manifest(entry);
       bindCopy(entry);
     }).catch(function () {
@@ -159,9 +159,9 @@
   function renderCatalog() {
     document.title = "hplugins - community Heretic plugins";
     view.innerHTML =
-      '<header class="catalog-head"><h1 class="catalog-title">The parts bin for Heretic.</h1>' +
-      '<p class="catalog-intro">Community scorers, modifiers, configs, and models that sit outside the default build. ' +
-      'Every entry has a source and a prompt you can hand to a coding model.</p></header>' +
+      '<header class="catalog-head"><h1 class="catalog-title">Do more with Heretic.</h1>' +
+      '<p class="catalog-intro">Community-built scorers, modifiers, and configs. Every entry has a source, a guide, ' +
+      'and a prompt your coding model can follow.</p></header>' +
       '<div class="toolbar">' +
       '<div class="field"><label class="field-label" for="search-input">Search the index</label>' +
       '<input id="search-input" type="search" autocomplete="off" placeholder="krea2, gibberish, classifier..."></div>' +
@@ -169,7 +169,7 @@
       '<select id="sort-select"><option value="index">Index</option><option value="name">Name</option>' +
       '<option value="author">Author</option></select></div>' +
       '<button class="text-button" type="button" id="reset-button">Reset</button></div>' +
-      '<div class="results-line"><span id="result-count"></span><span>select a row to pin it</span></div>' +
+      '<div class="results-line"><span id="result-count"></span><span>select a part to see its setup prompt</span></div>' +
       '<ol class="entry-list" id="entry-list"></ol>';
 
     var search = document.getElementById("search-input");

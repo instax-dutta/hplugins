@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Krea 2 / Krea 2 Turbo structural-conditioning scorers for Heretic 2.1.0.
 
-  ./krea2_drift_v2.1.py:Krea2Good    optimization = "minimize"
-  ./krea2_drift_v2.1.py:Krea2Bad     optimization = "maximize"
+  ./krea2_drift_v2.py:Krea2Good    optimization = "minimize"
+  ./krea2_drift_v2.py:Krea2Bad     optimization = "maximize"
 
 Both estimate how far an ablation moves the conditioning, without generating an
 image. The quantity is the fused text tensor the DiT actually consumes:
@@ -63,7 +63,8 @@ the diffusers transformer_krea2.py.
 
 The text path is transcribed from krea-ai/krea-2 mmdit.py and was checked
 numerically against the official TextFusionTransformer + txtmlp on identical
-weights and inputs (cos >= 0.99996):
+weights and inputs (implementation-validation cosine >= 0.99996; this is not the
+runtime scorer metric):
   RMSNorm   : F.rms_norm(x.float(), eps=1e-5, weight=scale + 1.0) -> x.dtype
   QKNorm    : qnorm(q), knorm(k), v
   Attention : wo(sdpa(q,k,v,mask) * sigmoid(gate(x)))   -- no RoPE in fusion
@@ -77,7 +78,7 @@ Deviations, metric-neutral because baseline and trial share them:
   * default SDPA backend instead of forced CUDNN_ATTENTION;
   * eager RMSNorm instead of @torch.compile;
   * fully-masked padding rows get self-attention instead of NaN. Real queries
-    never attend to them, and those rows are dropped before the cosine.
+    never attend to them, and those rows are excluded from the distance metric.
 
 Each scorer keeps only its own fused baseline (bf16, CPU; pinned when the
 compute device is CUDA); the 12-layer tap tensors are not kept, and the prompt
@@ -142,8 +143,16 @@ TRIM_PERCENT = 10
 NOISE_TOPUP_PASSES = 7
 
 # VRAM chunking of the text path.
-FUSION_CHUNK_TOKENS = 8192  # layerwise blocks; each token carries 12 tap vectors
+# Layerwise blocks: each token carries 12 tap vectors and costs about 1 MB of
+# peak activations (SwiGLU 6912 wide, fp32 RMSNorm copies), measured at the real
+# dimensions. 512 tokens ~ 0.5 GB; 8192 would not chunk a 4096-token batch at all
+# (~4 GB). The result does not depend on the chunk size, only the peak does.
+FUSION_CHUNK_TOKENS = 512
 FUSION_CHUNK_PROMPTS = 8  # refiner blocks + txtmlp
+
+# Rows (tokens) per step of the drift computation. Its FP32 temporaries stay at
+# about 12 MB each whatever max_batch_tokens is.
+DRIFT_CHUNK_ROWS = 512
 
 # Only these dtypes may feed the text path. Anything else (int8, fp8, ...) is a
 # quantised tensor that load_state_dict would silently cast into garbage.
@@ -505,31 +514,30 @@ class _Taps:
 
     def __init__(self):
         self.states: torch.Tensor | None = None
-        self.filled: set[int] = set()
+        self.n_filled = 0
 
     def put(self, slot: int, states: torch.Tensor, device: torch.device) -> None:
         if self.states is None:
             b, l, d = states.shape
             self.states = states.new_empty((b, l, N_TAPS, d), device=device)
         self.states[:, :, slot, :].copy_(states)
-        self.filled.add(slot)
+        self.n_filled += 1
 
     def take(self) -> torch.Tensor:
         """Hand the buffer over; this object keeps no reference to it."""
-        if len(self.filled) != N_TAPS:
-            raise RuntimeError(f"Captured {len(self.filled)} of {N_TAPS} taps")
+        if self.n_filled != N_TAPS:
+            raise RuntimeError(f"Captured {self.n_filled} of {N_TAPS} taps")
         states, self.states = self.states, None
         return states
 
 
 class _Batch:
-    __slots__ = ("input_ids", "attention_mask", "token_mask", "counts", "indices")
+    __slots__ = ("input_ids", "attention_mask", "token_mask", "indices")
 
-    def __init__(self, input_ids, attention_mask, token_mask, counts, indices):
+    def __init__(self, input_ids, attention_mask, token_mask, indices):
         self.input_ids = input_ids            # (B, W) long, CPU
         self.attention_mask = attention_mask  # (B, W) long, CPU
         self.token_mask = token_mask          # (B, W - prefix) bool, CPU
-        self.counts = counts                  # (B,) float32, CPU
         self.indices = indices                # list[int]: original prompt ids
 
 
@@ -694,17 +702,33 @@ class _Krea2Scorer(Scorer):
     # -------------------------------------------------------------- tokenize
 
     def _tokenize(self, tokenizer, texts: list[str]) -> list[list[int]]:
-        prefix_ids = tokenizer([KREA_PREFIX], return_tensors="pt")["input_ids"][0].tolist()
-        if len(prefix_ids) != PREFIX_TOKENS:
-            raise RuntimeError(
-                f"Krea prefix -> {len(prefix_ids)} tokens, expected {PREFIX_TOKENS}. "
-                "Wrong tokenizer, or the template string was edited."
+        # Prefix / suffix / pad_id are fixed for a tokenizer; cache after first call
+        # (init top-ups would otherwise re-encode the same template strings).
+        if not hasattr(self, "_prefix_ids"):
+            prefix_ids = tokenizer([KREA_PREFIX], return_tensors="pt")["input_ids"][
+                0
+            ].tolist()
+            if len(prefix_ids) != PREFIX_TOKENS:
+                raise RuntimeError(
+                    f"Krea prefix -> {len(prefix_ids)} tokens, expected {PREFIX_TOKENS}. "
+                    "Wrong tokenizer, or the template string was edited."
+                )
+            suffix_ids = tokenizer([KREA_SUFFIX], return_tensors="pt")["input_ids"][
+                0
+            ].tolist()
+            if len(suffix_ids) != SUFFIX_TOKENS:
+                raise RuntimeError(
+                    f"Krea suffix -> {len(suffix_ids)} tokens, expected {SUFFIX_TOKENS}."
+                )
+            self._prefix_ids = prefix_ids
+            self._suffix_ids = suffix_ids
+            self._pad_id = int(
+                tokenizer.pad_token_id
+                if tokenizer.pad_token_id is not None
+                else tokenizer.eos_token_id
             )
-        suffix_ids = tokenizer([KREA_SUFFIX], return_tensors="pt")["input_ids"][0].tolist()
-        if len(suffix_ids) != SUFFIX_TOKENS:
-            raise RuntimeError(
-                f"Krea suffix -> {len(suffix_ids)} tokens, expected {SUFFIX_TOKENS}."
-            )
+        prefix_ids = self._prefix_ids
+        suffix_ids = self._suffix_ids
         block = self.settings.max_length + PREFIX_TOKENS - SUFFIX_TOKENS
         encoded = tokenizer(
             [KREA_PREFIX + t for t in texts],
@@ -730,11 +754,6 @@ class _Krea2Scorer(Scorer):
                 f"[yellow]* {truncated} caption(s) reach max_length="
                 f"{self.settings.max_length} and were truncated.[/]"
             )
-        self._pad_id = int(
-            tokenizer.pad_token_id
-            if tokenizer.pad_token_id is not None
-            else tokenizer.eos_token_id
-        )
         return seqs
 
     def _make_batch(self, indices: list[int]) -> _Batch:
@@ -742,15 +761,17 @@ class _Krea2Scorer(Scorer):
         width, n = max(len(s) for s in rows), len(rows)
         input_ids = torch.full((n, width), self._pad_id, dtype=torch.long)
         attention_mask = torch.zeros((n, width), dtype=torch.long)
-        counts = torch.empty(n, dtype=torch.float32)
+        lengths: list[int] = []
         for r, seq in enumerate(rows):
             length = len(seq)
-            input_ids[r, :length] = torch.tensor(seq, dtype=torch.long)
+            input_ids[r, :length] = torch.as_tensor(seq, dtype=torch.long)
             attention_mask[r, :length] = 1
-            counts[r] = length - PREFIX_TOKENS
+            lengths.append(length - PREFIX_TOKENS)
+        if any(c < 1 for c in lengths):
+            raise ValueError("every prompt must contain at least one valid token")
         positions = torch.arange(width - PREFIX_TOKENS).unsqueeze(0)
-        token_mask = positions < counts.long().unsqueeze(1)
-        return _Batch(input_ids, attention_mask, token_mask, counts, list(indices))
+        token_mask = positions < torch.as_tensor(lengths).unsqueeze(1)
+        return _Batch(input_ids, attention_mask, token_mask, list(indices))
 
     def _build_batches(
         self, budget: int | None = None, descending: bool = False
@@ -962,12 +983,13 @@ class _Krea2Scorer(Scorer):
         solo_batch = self._make_batch([short])
         solo = self._condition(solo_batch)
         pair = self._condition(self._make_batch([short, long_]))
-        n = int(solo_batch.counts[0].item())
-        cos = F.cosine_similarity(
-            solo[0, :n].float(), pair[0, :n].float(), dim=-1, eps=1e-8
+        n = int(solo_batch.token_mask[0].sum().item())
+        valid_tokens = torch.ones((1, n), dtype=torch.bool, device=solo.device)
+        cos = _mean_token_cosine(
+            pair[0:1, :n, :], solo[0:1, :n, :], valid_tokens
         )
-        drift = 100.0 * (1.0 - float(cos.mean()))
-        del solo, pair, cos
+        drift = 100.0 * (1.0 - float(cos[0].item()))
+        del solo, pair, valid_tokens, cos
         limit = float(self.settings.noise_limit)
         print(f"* Padding probe: drift {drift:.4f}%, noise_limit {limit:.4f}%")
         # A prompt's drift is a mean over its tokens, so the probe is judged alike.
@@ -994,6 +1016,8 @@ class _Krea2Scorer(Scorer):
         base_sets = [set(batch.indices) for batch in self._batches]
         device = self._device()
         noise = [0.0] * len(self._texts)
+        cos_parts: list[torch.Tensor] = []
+        order: list[int] = []
         regrouped = False
         alt = self._build_batches(
             budget=max(1, self.settings.max_batch_tokens // 2), descending=True
@@ -1001,16 +1025,28 @@ class _Krea2Scorer(Scorer):
         for batch in alt:
             members = set(batch.indices)
             cur = self._condition(batch)
+            # Gather baseline rows into one (B, T, F) tensor, then one cosine
+            # over the whole alt batch (same metric as before; fewer kernels).
+            bsz, width, features = cur.shape
+            # Zeros on padding; only valid tokens (token_mask) enter the cosine.
+            ref = cur.new_zeros((bsz, width, features))
             for row, prompt in enumerate(batch.indices):
                 b, base_row = where[prompt]
                 regrouped = regrouped or members != base_sets[b]
-                n = int(batch.counts[row].item())
-                ref = self._baseline[b][base_row, :n].to(device, non_blocking=True)
-                cos = F.cosine_similarity(
-                    cur[row, :n].float(), ref.float(), dim=-1, eps=1e-8
+                n = int(batch.token_mask[row].sum().item())
+                ref[row, :n].copy_(
+                    self._baseline[b][base_row, :n].to(device, non_blocking=True)
                 )
-                noise[prompt] = max(0.0, 100.0 * (1.0 - float(cos.double().mean())))
-            del cur
+            cos = _mean_token_cosine(
+                cur, ref, batch.token_mask.to(device, non_blocking=True)
+            )
+            cos_parts.append(cos)
+            order += batch.indices
+            del cur, ref
+        # One transfer for all prompts instead of a sync per prompt.
+        cos_values = torch.cat(cos_parts).cpu().tolist()
+        for prompt, cos in zip(order, cos_values):
+            noise[prompt] = max(0.0, 100.0 * (1.0 - cos))
         return noise, regrouped
 
     # -------------------------------------------------------------- baseline
@@ -1034,17 +1070,10 @@ class _Krea2Scorer(Scorer):
 
     # --------------------------------------------------------------- scoring
 
-    def _prompt_mean(self, cos: torch.Tensor, batch: _Batch) -> torch.Tensor:
-        device = cos.device
-        mask = batch.token_mask.to(device, non_blocking=True)
-        cos = torch.where(mask, cos, torch.zeros_like(cos))
-        counts = batch.counts.to(device, non_blocking=True)
-        return cos.sum(dim=-1) / counts
-
     def _measure(self) -> torch.Tensor | None:
-        """Per-prompt cosine of the fused conditioning against the baseline. CPU float64."""
+        """Per-prompt mean token cosine against the baseline. CPU float32."""
         device = self._device()
-        means: list[torch.Tensor] = []  # stay on the compute device until the end
+        cos_parts: list[torch.Tensor] = []
         order: list[int] = []
         for i, batch in enumerate(self._batches):
             cur = self._condition(batch)
@@ -1053,15 +1082,16 @@ class _Krea2Scorer(Scorer):
                 raise RuntimeError(
                     f"Fused shape {tuple(cur.shape)} vs baseline {tuple(base_f.shape)}"
                 )
-            fcos = F.cosine_similarity(cur.float(), base_f.float(), dim=-1, eps=1e-8)
+            cos = _mean_token_cosine(
+                cur, base_f, batch.token_mask.to(device, non_blocking=True)
+            )
             del cur, base_f
-            means.append(self._prompt_mean(fcos, batch))
+            cos_parts.append(cos)
             order += batch.indices
-            del fcos
         # One transfer for all batches: reading each result back separately
         # would make the CPU wait for the GPU after every batch.
-        fused = torch.empty(len(self._labels), dtype=torch.float64)
-        fused[torch.as_tensor(order)] = torch.cat(means).cpu().double()
+        fused = torch.empty(len(self._labels), dtype=torch.float32)
+        fused[torch.as_tensor(order)] = torch.cat(cos_parts).cpu()
         if not torch.isfinite(fused).all():
             return None
         return fused
@@ -1096,6 +1126,55 @@ class _Krea2Scorer(Scorer):
 
     def get_baseline_score(self, ctx: Context) -> Score:
         return self._score(0.0, "baseline")
+
+
+def _mean_token_cosine(
+    current: torch.Tensor,
+    reference: torch.Tensor,
+    token_mask: torch.Tensor,
+) -> torch.Tensor:
+    """Mean token cosine per prompt, from one pass over the two tensors.
+
+    Inputs have shape (batch, tokens, features), contiguous (reshape must be a
+    view, or it would copy). Returns float32 tensor of shape (batch,): mean over
+    valid tokens of F.cosine_similarity(eps=1e-8). The caller turns it into
+    100 * (1 - cos).
+
+    Only tokens selected by token_mask contribute. Tokens are processed in
+    chunks of DRIFT_CHUNK_ROWS rows, in FP32, so the temporaries do not grow with
+    the batch. No host/device synchronisation happens here; prompts without a
+    valid token are rejected on the CPU in _make_batch.
+    """
+    if current.ndim != 3 or reference.ndim != 3:
+        raise ValueError("conditioning tensors must have shape (batch, tokens, features)")
+    if current.shape != reference.shape:
+        raise ValueError(
+            f"conditioning shape mismatch: {tuple(current.shape)} vs {tuple(reference.shape)}"
+        )
+    if token_mask.shape != current.shape[:2]:
+        raise ValueError(
+            f"token mask shape {tuple(token_mask.shape)} does not match "
+            f"conditioning {tuple(current.shape[:2])}"
+        )
+
+    batch_size, token_count, features = current.shape
+    rows = batch_size * token_count
+    cur2d = current.reshape(rows, features)
+    ref2d = reference.reshape(rows, features)
+
+    cosine = torch.empty(rows, device=current.device, dtype=torch.float32)
+    for start in range(0, rows, DRIFT_CHUNK_ROWS):
+        end = min(start + DRIFT_CHUNK_ROWS, rows)
+        cur = cur2d[start:end].float()
+        ref = ref2d[start:end].float()
+        cosine[start:end] = F.cosine_similarity(cur, ref, dim=-1, eps=1e-8)
+        del cur, ref
+
+    valid = token_mask.to(device=current.device, dtype=torch.bool).reshape(rows)
+    zeros = torch.zeros_like(cosine)
+    cosine_sum = torch.where(valid, cosine, zeros).view(batch_size, -1).sum(1)
+    valid_count = valid.view(batch_size, -1).sum(1).float()
+    return cosine_sum / valid_count
 
 
 def _trimmed_extreme(

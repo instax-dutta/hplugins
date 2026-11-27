@@ -56,8 +56,8 @@ Planned: SOMA (multi-directional transport modifier, expected as a default plugi
 | Name / class | Author | Source | What it scores | Status |
 | --- | --- | --- | --- | --- |
 | `Krea2Drift` (`./krea2_drift.py:Krea2Drift`) | zubzer0 | local file (2026-11-23 post) | Mean cosine drift of the fused Krea 2 text conditioning vs baseline; `score_name` "Krea 2 drift" | Personal-use plugin; config uses `optimization = "none"` (reference only) |
-| `Krea2Good` (`./krea2_drift_v2.py:Krea2Good`) | zubzer0 | local file (2026-11-26 post); header calls it `krea2_drift_v2.1.py` | p90max drift of good-image prompts, in percent; "Krea2 good p90max" | minimize (keeps good prompts stable) |
-| `Krea2Bad` (`./krea2_drift_v2.py:Krea2Bad`) | zubzer0 | same file | p90min drift of bad-image prompts, in percent; "Krea2 bad p90min" | maximize (moves bad-image prompts) |
+| `Krea2Good` (`krea2_drift_v2.py:Krea2Good`) | zubzer0 | local file (final version, 2026-11-28 post) | p90max cosine drift of good-image prompts, in percent; "Krea2 good p90max" | minimize (keeps good prompts stable) |
+| `Krea2Bad` (`krea2_drift_v2.py:Krea2Bad`) | zubzer0 | same file | p90min cosine drift of bad-image prompts, in percent; "Krea2 bad p90min" | maximize (moves bad-image prompts) |
 | `GibberishRate` (`[scorer.GibberishRate]`) | randomlygeneratedusername (Claude-assisted) | Discord config snippet, 2026-11-04, no repo link | Detects gibberish via distinct Unicode scripts (`max_scripts`, `min_characters_per_script`); skips/aborts trials | Config-only community scorer, no source posted |
 | Custom benchmark scorer ("calibrated PIQA") | electroglyph | https://github.com/electroglyph/heretic | Benchmark score on flip-flopping PIQA questions, used for GPQA-correlated runs | Working fork with custom scorer |
 | LLM judge scorer | kurigohanandkamehameha | Heretic "LLM judge" PR (discussed 2026-03 to 2026-11) | LLM classifies refusals/compliance via OpenAI-compatible API | PR/proposal, not part of shipped scorers as of export |
@@ -95,32 +95,35 @@ scorers = [
 ]
 ```
 
-Krea 2 pair (2026-11-26):
+Krea 2 pair (final version, 2026-11-28):
 
 ```toml
-{ plugin = "heretic.scorers.kl_divergence.KLDivergence", optimization = "minimize" },
-{ plugin = "./krea2_drift_v2.py:Krea2Good", optimization = "minimize" },
-{ plugin = "./krea2_drift_v2.py:Krea2Bad", optimization = "maximize" },
+{ plugin = "krea2_drift_v2.py:Krea2Good", optimization = "minimize" },
+{ plugin = "krea2_drift_v2.py:Krea2Bad", optimization = "maximize" },
 
 [scorer.Krea2Good]
-checkpoint_path = "Krea2_turbo_bf16.safetensors"
+checkpoint_path = "Krea2turbo_bf16.safetensors"
 max_length = 512
+# no more 512, strict rule krea2
 max_batch_tokens = 4096
+# 1024 for 12Gb vram; 8192 for 18+Gb vram
 measure_noise_floor = true
 noise_limit = 0.01
 
 [scorer.Krea2Bad]
-checkpoint_path = "Krea2_turbo_bf16.safetensors"
+checkpoint_path = "Krea2turbo_bf16.safetensors"
 max_length = 512
+# no more 512, strict rule krea2
 max_batch_tokens = 4096
+# 1024 for 12Gb vram; 8192 for 18+Gb vram
 measure_noise_floor = true
 noise_limit = 0.01
 
 [scorer.Krea2Good.prompts]
-dataset = "GOOD_prompts.txt"
+dataset = "GOOD_image_prompts.txt"
 split = "[:200]"
 
 [scorer.Krea2Bad.prompts]
-dataset = "BAD_prompts.txt"
+dataset = "BAD_image_prompts.txt"
 split = "[:200]"
 ```
